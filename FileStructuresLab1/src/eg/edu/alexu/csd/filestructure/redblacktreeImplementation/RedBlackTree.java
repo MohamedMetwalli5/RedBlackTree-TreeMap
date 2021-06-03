@@ -59,7 +59,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			nilLeaf.setParent(root);
 			return;
 		}
-		//Node<T,V> temp =new Node<T,V>(root.getKey(),root.getValue(),root.getColor(),root.getRightChild(),root.getLeftChild());
+		
  		Node<T,V> temp=root;
  		while(!temp.isNull()) {
 			if(temp.getKey().compareTo(key)<0) {
@@ -80,7 +80,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		temp.setParent(parent);
 		
 		//call the fix up
-		//insertFix()
+		insertFix(temp);
 	}
 
 	@Override
@@ -94,7 +94,63 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	/*takes the new inserted node and checks if there is a 
 	 * violation and fix it depending on the current violation*/
 	private void insertFix(Node<T,V> inserted) {
-		
+		Node<T,V> uncle=nil;
+		while(inserted.getParent().getColor()==Node.RED) {
+			//the parent of the inserted is a left child
+		if(compareTwoNodes(inserted.getParent(),inserted.getParent().getParent().getLeftChild())) {
+			//get the uncle of the inserted
+			uncle=(Node<T, V>) inserted.getParent().getParent().getRightChild();
+			
+			//case 1 uncle is red so we recolor
+			if(uncle.getColor()==Node.RED) {
+				inserted.getParent().setColor(Node.BLACK);
+				uncle.setColor(Node.BLACK);
+				uncle.getParent().setColor(Node.RED);
+				inserted=(Node<T, V>) inserted.getParent().getParent();	
+			}
+			//case 2 uncle is black and the inserted is a right child
+			else if(compareTwoNodes(inserted,inserted.getParent().getRightChild())) {
+				//left rotate around parent 
+				inserted=(Node<T, V>) inserted.getParent();
+				rotateLeft(inserted);
+			}
+			//case 3 if uncle is black and inserted is a left child
+			else if(compareTwoNodes(inserted,inserted.getParent().getLeftChild())){
+				//recolor and rotate around grandparent
+				inserted.getParent().setColor(Node.BLACK);
+				inserted.getParent().getParent().setColor(Node.RED);
+				rotateRight((Node<T, V>) inserted.getParent().getParent());
+					
+			}
+		}
+		else {
+			//the inserted parent is a right child
+			uncle=(Node<T, V>) inserted.getParent().getParent().getLeftChild();
+			
+			//case 1 uncle is red so we recolor
+			if(uncle.getColor()==Node.RED) {
+				inserted.getParent().setColor(Node.BLACK);
+				uncle.setColor(Node.BLACK);
+				uncle.getParent().setColor(Node.RED);
+				inserted=(Node<T, V>) inserted.getParent().getParent();	
+			}
+			//case 2 uncle is black and the inserted is a left child
+			else if(compareTwoNodes(inserted,inserted.getParent().getLeftChild())) {
+				//left rotate around parent 
+				inserted=(Node<T, V>) inserted.getParent();
+				rotateRight(inserted);
+			}
+			//case 3 if uncle is black and inserted is a right child
+			else if(compareTwoNodes(inserted,inserted.getParent().getRightChild())){
+				//recolor and rotate around grandparent
+				inserted.getParent().setColor(Node.BLACK);
+				inserted.getParent().getParent().setColor(Node.RED);
+				rotateLeft((Node<T, V>) inserted.getParent().getParent());
+					
+			}
+		}
+	}
+	root.setColor(Node.BLACK);
 	}
 	private void rotateRight(Node<T,V> toBeRotated) {
 		
@@ -119,6 +175,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		Node <T,V> temp=(Node<T, V>) toBeRotated.getRightChild();
 		toBeRotated.setRightChild(temp.getLeftChild());
 		
+		
 		if(!temp.getLeftChild().isNull())
 			temp.getLeftChild().setParent(toBeRotated);
 		temp.setParent(toBeRotated.getParent());
@@ -134,7 +191,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
 	
 	//return true if the two nodes have the same key(means that they are the same node)
-	private boolean compareTwoNodes(INode<T, V> iNode,Node<T,V> B ) {
+	private boolean compareTwoNodes(INode<T, V> iNode,INode<T,V> B ) {
 		return (iNode.getKey().compareTo(B.getKey())==0) ? true:false;
 	}
 	
