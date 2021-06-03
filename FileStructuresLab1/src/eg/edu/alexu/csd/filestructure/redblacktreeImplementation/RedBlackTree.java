@@ -6,7 +6,7 @@ import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
 	private Node<T,V> nil =new Node<T,V>();
-	private Node<T,V> nilLeaf =new Node<T,V>();
+	//private Node<T,V> nilLeaf =new Node<T,V>();
 	private Node<T,V> root=nil;
 	@Override
 	public INode<T, V> getRoot() {
@@ -54,6 +54,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	public void insert(T key, V value) {
 		// TODO Auto-generated method stub
  		if(root.isNull()) {//inserting in empty tree
+ 			Node<T,V> nilLeaf =new Node<T,V>();
 			root=new Node<T,V>(key,value,Node.BLACK,nilLeaf,nilLeaf);
 			root.setParent(nil);
 			nilLeaf.setParent(root);
@@ -61,26 +62,33 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 		
  		Node<T,V> temp=root;
+  		boolean flag=false;
  		while(!temp.isNull()) {
+ 			
 			if(temp.getKey().compareTo(key)<0) {
 				temp=(Node<T, V>) temp.getRightChild();
+				flag=false;
 			}
 			else if(temp.getKey().compareTo(key)>0) {
 				temp=(Node<T, V>) temp.getLeftChild();
+				flag=true;
 			}
 			else
 				break;//the same key so i update the associated node
 		}
 		Node <T,V>parent= (Node<T, V>) temp.getParent();
-		temp.setColor(Node.RED);
-		temp.setKey(key);
-		temp.setValue(value);
-		temp.setRightChild(nilLeaf);
-		temp.setLeftChild(nilLeaf);
-		temp.setParent(parent);
+		Node<T,V> nilLeaf =new Node<T,V>();
+		Node<T,V> holder=new Node(key,value,Node.RED,nilLeaf,nilLeaf);
+		nilLeaf.setParent(holder);
+		holder.setParent(parent);
+		if(flag)
+			parent.setLeftChild(holder);
+		else
+			parent.setRightChild(holder);
+		
 		
 		//call the fix up
-		insertFix(temp);
+		insertFix(holder);
 	}
 
 	@Override
@@ -192,6 +200,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	
 	//return true if the two nodes have the same key(means that they are the same node)
 	private boolean compareTwoNodes(INode<T, V> iNode,INode<T,V> B ) {
+		if(B.isNull()||iNode.isNull())
+			return false;
 		return (iNode.getKey().compareTo(B.getKey())==0) ? true:false;
 	}
 	
