@@ -15,10 +15,12 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 	*/
 	
 	//main constructor
-	protected Node(T key,V value, boolean color){
+	protected Node(T key,V value, boolean color,INode<T,V> rightChild,INode<T,V> leftChild){
 		this.color=color;
 		this.key= key;
 		this.value= value;
+		this.rightChild=(Node<T, V>) rightChild;
+		this.leftChild=(Node<T, V>) leftChild;
 	}
 	//nil constructor
 	protected Node() {
