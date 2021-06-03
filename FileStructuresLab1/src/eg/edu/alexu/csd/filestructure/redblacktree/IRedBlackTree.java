@@ -2,6 +2,7 @@ package eg.edu.alexu.csd.filestructure.redblacktree;
 
 public interface IRedBlackTree<T extends Comparable<T>, V> {
 
+	
 	/**
 	 * return the root of the given Red black tree.
 	 * @return root.
