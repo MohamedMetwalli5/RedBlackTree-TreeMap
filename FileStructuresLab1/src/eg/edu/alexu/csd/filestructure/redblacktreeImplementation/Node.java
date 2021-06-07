@@ -23,9 +23,14 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 		this.leftChild=(Node<T, V>) leftChild;
 	}
 	//nil constructor
+	protected Node(INode<T,V> right,INode<T,V> left) {
+		this.color=BLACK;
+		this.rightChild=(Node<T, V>) right;
+		this.leftChild=(Node<T, V>) left;
+	}
 	protected Node() {
 		this.color=BLACK;
-	}
+			}
 	@Override
 	public void setParent(INode<T, V> parent) {
 		// TODO Auto-generated method stub
