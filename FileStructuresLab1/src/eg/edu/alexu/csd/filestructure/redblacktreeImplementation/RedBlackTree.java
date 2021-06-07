@@ -6,7 +6,6 @@ import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
 	private Node<T,V> nil = new Node<T,V>();
-	//private Node<T,V> nilLeaf =new Node<T,V>();
 	private Node<T,V> root = nil;
 	@Override
 	public INode<T, V> getRoot() {
@@ -31,6 +30,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	public V search(T comparable) {
 		// TODO Auto-generated method stub
 		Node<T,V> temp =new Node<T,V>(root.getKey(),root.getValue(),root.getColor(),root.getRightChild(),root.getLeftChild());
+		
 		while(!temp.isNull()) {
 			if(temp.getKey().compareTo(comparable)==0)
 				return temp.getValue();
@@ -54,39 +54,45 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	public void insert(T key, V value) {
 		// TODO Auto-generated method stub
  		if(root.isNull()) {//inserting in empty tree
- 			Node<T,V> nilLeaf =new Node<T,V>();
-			root=new Node<T,V>(key,value,Node.BLACK,nilLeaf,nilLeaf);
+			root=new Node<T,V>(key,value,Node.BLACK,nil,nil);
 			root.setParent(nil);
-			nilLeaf.setParent(root);
 			return;
 		}
 		
  		Node<T,V> temp=root;
+ 		Node<T,V> child=temp;
   		boolean flag=false;
- 		while(!temp.isNull()) {
- 			
+  		boolean update =false;
+ 		while(!child.isNull()) {
+ 			temp=child;
 			if(temp.getKey().compareTo(key)<0) {
-				temp=(Node<T, V>) temp.getRightChild();
+				
+				child=(Node<T, V>) temp.getRightChild();
 				flag=false;
+				
 			}
 			else if(temp.getKey().compareTo(key)>0) {
-				temp=(Node<T, V>) temp.getLeftChild();
+				child=(Node<T, V>) temp.getLeftChild();
 				flag=true;
+				
 			}
-			else
-				break;//the same key so i update the associated node
+			else{//the same key so i update the associated node
+				temp.setValue(value);
+				update=true;
+				break;
+				
+			}
 		}
-		Node <T,V>parent= (Node<T, V>) temp.getParent();
-		Node<T,V> nilLeaf =new Node<T,V>();
-		Node<T,V> holder=new Node(key,value,Node.RED,nilLeaf,nilLeaf);
-		nilLeaf.setParent(holder);
-		holder.setParent(parent);
+ 		if(!update) {
+		Node<T,V> holder=new Node(key,value,Node.RED,nil,nil);
+		holder.setParent(temp);
 		if(flag)
-			parent.setLeftChild(holder);
+			temp.setLeftChild(holder);
 		else
-			parent.setRightChild(holder);
+			temp.setRightChild(holder);
 		//call the fix up
 		insertFix(holder);
+ 		}
 	}
 
 	//<------------------------------------------------------------------------------------------------------------------------------------>	
@@ -150,65 +156,65 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		return node;
 	}
 
-	private void removeFixup(Node x){
-		Node w;
-		while (!compareTwoNodes(x, root) && x.getColor() == Node.BLACK){
-			if (compareTwoNodes(x, x.getParent().getLeftChild())){
-				w = (Node) x.getParent().getRightChild();
-				if (w.getColor() == Node.RED){
-					w.setColor(Node.BLACK);
-					x.getParent().setColor(Node.RED);
-					rotateLeft((Node<T, V>) x.getParent());
-					w = (Node) x.getParent().getRightChild();
+	private void removeFixup(Node toBeDeleted){
+		Node sibling=new Node();
+		while (!compareTwoNodes(toBeDeleted, root) && toBeDeleted.getColor() == Node.BLACK){
+			if (compareTwoNodes(toBeDeleted, toBeDeleted.getParent().getLeftChild())){
+				sibling = (Node) toBeDeleted.getParent().getRightChild();
+				if (sibling.getColor() == Node.RED){
+					sibling.setColor(Node.BLACK);
+					toBeDeleted.getParent().setColor(Node.RED);
+					rotateLeft((Node<T, V>) toBeDeleted.getParent());
+					sibling = (Node) toBeDeleted.getParent().getRightChild();
 				}
-				if (w.getLeftChild().getColor() == Node.BLACK &&
-							w.getRightChild().getColor() == Node.BLACK){
-					w.setColor(Node.RED);
-					x = (Node) x.getParent();
+				if (sibling.getLeftChild().getColor() == Node.BLACK &&
+							sibling.getRightChild().getColor() == Node.BLACK){
+					sibling.setColor(Node.RED);
+					toBeDeleted = (Node) toBeDeleted.getParent();
 				}else{
-					if (w.getRightChild().getColor() == Node.BLACK){
-						w.getLeftChild().setColor(Node.BLACK);
-						w.setColor(Node.RED);
-						rotateRight(w);
-						w = (Node) x.getParent().getRightChild();
+					if (sibling.getRightChild().getColor() == Node.BLACK){
+						sibling.getLeftChild().setColor(Node.BLACK);
+						sibling.setColor(Node.RED);
+						rotateRight(sibling);
+						sibling = (Node) toBeDeleted.getParent().getRightChild();
 					}
-					w.setColor(x.getParent().getColor());
-					x.getParent().setColor(Node.BLACK);
-					w.getRightChild().setColor(Node.BLACK);
-					rotateLeft((Node<T, V>) x.getParent());
-					x = root;
+					sibling.setColor(toBeDeleted.getParent().getColor());
+					toBeDeleted.getParent().setColor(Node.BLACK);
+					sibling.getRightChild().setColor(Node.BLACK);
+					rotateLeft((Node<T, V>) toBeDeleted.getParent());
+					toBeDeleted = root;
 				}
 			}else{
-				w = (Node) x.getParent().getLeftChild();
-				if (w.getColor() == Node.RED){
-					w.setColor(Node.BLACK);
-					x.getParent().setColor(Node.RED);
-					rotateRight((Node) x.getParent());
-					w = (Node) x.getParent().getLeftChild();
+				sibling = (Node) toBeDeleted.getParent().getLeftChild();
+				if (sibling.getColor() == Node.RED){
+					sibling.setColor(Node.BLACK);
+					toBeDeleted.getParent().setColor(Node.RED);
+					rotateRight((Node) toBeDeleted.getParent());
+					sibling = (Node) toBeDeleted.getParent().getLeftChild();
 				}
-				if (w.getRightChild().getColor() == Node.BLACK &&
-							w.getLeftChild().getColor() == Node.BLACK){
-					w.setColor(Node.RED);
-					x = (Node) x.getParent();
+				if (sibling.getRightChild().getColor() == Node.BLACK &&
+							sibling.getLeftChild().getColor() == Node.BLACK){
+					sibling.setColor(Node.RED);
+					toBeDeleted = (Node) toBeDeleted.getParent();
 				}else{
-					 if (w.getLeftChild().getColor() == Node.BLACK){
-						w.getRightChild().setColor(Node.BLACK);
-						w.setColor(Node.RED);
-						rotateLeft(w);
-						w = (Node) x.getParent().getLeftChild();
+					 if (sibling.getLeftChild().getColor() == Node.BLACK){
+						sibling.getRightChild().setColor(Node.BLACK);
+						sibling.setColor(Node.RED);
+						rotateLeft(sibling);
+						sibling = (Node) toBeDeleted.getParent().getLeftChild();
 					}
-					w.setColor(x.getParent().getColor());
-					x.getParent().setColor(Node.BLACK);
-					w.getLeftChild().setColor(Node.BLACK);
-					rotateRight((Node<T, V>) x.getParent());
-					x = root;
+					sibling.setColor(toBeDeleted.getParent().getColor());
+					toBeDeleted.getParent().setColor(Node.BLACK);
+					sibling.getLeftChild().setColor(Node.BLACK);
+					rotateRight((Node<T, V>) toBeDeleted.getParent());
+					toBeDeleted = root;
 				}
 			}
 		}
-		x.setColor(Node.BLACK);
+		toBeDeleted.setColor(Node.BLACK);
 	}
 	
-	public Node searchDelete(T key) {
+	public Node<T, V> searchDelete(T key) {
 		Node<T,V> temp =new Node<T,V>(root.getKey(),root.getValue(),root.getColor(),root.getRightChild(),root.getLeftChild());
 		while(!temp.isNull()) {
 			if(temp.getKey().compareTo(key) == 0) {

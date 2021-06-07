@@ -9,15 +9,19 @@ public class TestFunctionallity {
 		Node  <Integer,Integer>temp=test2;
 		Node <Integer,Integer>test3=new Node<Integer,Integer>(6,6,true,nil,nil);
 		RedBlackTree T=new RedBlackTree();
-		T.insert(5, "initroot");
-		T.insert(6, "init right");
-		T.insert(3, "init left");
-		T.insert(4, "inseted case 1 left");
-		T.insert(8, "second right");
-		T.insert(7, "second left right");
+		
+	T.delete(27);
+		T.insert(65, 65);
+		T.delete(19);
+		T.delete(0);
+		T.delete(3);
+		/*
+		T.insert(2, 2);
+		T.insert(2, 1);
+		T.search(11);*/
 
 
-		System.out.println(T);
+		System.out.println(T.search(11));
 		/*System.out.print(temp.getKey());
 		 * 
 		 */
