@@ -142,7 +142,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			return treeMinimum((Node) x.getRightChild());
 		}
 		Node result = (Node) x.getParent();
-		while (!result.isNull() && x == result.getRightChild()){
+		while (!result.isNull() && compareTwoNodes(x,result.getRightChild())){
 			x = result;
 			result = (Node) result.getParent();
 		}
@@ -155,29 +155,35 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 		return node;
 	}
-
+ 
+	
 	private void removeFixup(Node toBeDeleted){
 		Node sibling=new Node();
 		while (!compareTwoNodes(toBeDeleted, root) && toBeDeleted.getColor() == Node.BLACK){
-			if (compareTwoNodes(toBeDeleted, toBeDeleted.getParent().getLeftChild())){
-				sibling = (Node) toBeDeleted.getParent().getRightChild();
+			
+			if (compareTwoNodes(toBeDeleted, toBeDeleted.getParent().getLeftChild())){//check if the deleted node is a left child
+				sibling = (Node) toBeDeleted.getParent().getRightChild(); //getting sibling
+				//case 1 sibling is red
 				if (sibling.getColor() == Node.RED){
 					sibling.setColor(Node.BLACK);
 					toBeDeleted.getParent().setColor(Node.RED);
 					rotateLeft((Node<T, V>) toBeDeleted.getParent());
 					sibling = (Node) toBeDeleted.getParent().getRightChild();
 				}
+				//case 2 ,both sibling's children are black
 				if (sibling.getLeftChild().getColor() == Node.BLACK &&
 							sibling.getRightChild().getColor() == Node.BLACK){
 					sibling.setColor(Node.RED);
 					toBeDeleted = (Node) toBeDeleted.getParent();
 				}else{
+					//sibling's right child is black
 					if (sibling.getRightChild().getColor() == Node.BLACK){
 						sibling.getLeftChild().setColor(Node.BLACK);
 						sibling.setColor(Node.RED);
 						rotateRight(sibling);
 						sibling = (Node) toBeDeleted.getParent().getRightChild();
 					}
+					//sibling is black and it's right child is red
 					sibling.setColor(toBeDeleted.getParent().getColor());
 					toBeDeleted.getParent().setColor(Node.BLACK);
 					sibling.getRightChild().setColor(Node.BLACK);
@@ -185,24 +191,30 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 					toBeDeleted = root;
 				}
 			}else{
+				//if the deleted is a right child
 				sibling = (Node) toBeDeleted.getParent().getLeftChild();
+				
+				//case 1 sibling is red
 				if (sibling.getColor() == Node.RED){
 					sibling.setColor(Node.BLACK);
 					toBeDeleted.getParent().setColor(Node.RED);
 					rotateRight((Node) toBeDeleted.getParent());
 					sibling = (Node) toBeDeleted.getParent().getLeftChild();
 				}
+				//case 2 both sibling's children are black
 				if (sibling.getRightChild().getColor() == Node.BLACK &&
 							sibling.getLeftChild().getColor() == Node.BLACK){
 					sibling.setColor(Node.RED);
 					toBeDeleted = (Node) toBeDeleted.getParent();
 				}else{
+					//case 3 sibling's left child is black
 					 if (sibling.getLeftChild().getColor() == Node.BLACK){
 						sibling.getRightChild().setColor(Node.BLACK);
 						sibling.setColor(Node.RED);
 						rotateLeft(sibling);
 						sibling = (Node) toBeDeleted.getParent().getLeftChild();
 					}
+					 //case 4 sibling is black and it's left is red
 					sibling.setColor(toBeDeleted.getParent().getColor());
 					toBeDeleted.getParent().setColor(Node.BLACK);
 					sibling.getLeftChild().setColor(Node.BLACK);
