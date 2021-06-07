@@ -38,13 +38,12 @@ public class TestFunctionallity {
 		 T.insert(37, 99);
 		 T.delete(51);
 		 T.insert(95, 35);
-		 T.delete(65);
 		 T.delete(81);
 		 T.insert(61, 46);
 		 T.insert(50, 33);
 		 print(T.getRoot());
-		 //T.delete(5);
-
+		 T.delete(5);
+		 print(T.getRoot());
 		 
 		
 		/*

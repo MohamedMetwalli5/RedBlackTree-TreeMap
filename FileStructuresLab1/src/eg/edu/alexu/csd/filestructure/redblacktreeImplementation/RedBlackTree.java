@@ -113,7 +113,13 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		Node z = searchDelete(key);
 		Node x = new Node<>(); //nil
 		Node y = new Node<>(); //nil
-
+		Node sibling=new Node<>();
+		if (compareTwoNodes(z,z.getParent().getLeftChild()))//check if the deleted node is a left child
+			sibling = (Node) z.getParent().getRightChild(); //getting sibling
+		else
+			sibling = (Node) z.getParent().getLeftChild();
+		
+		Node parent=(Node) z.getParent();
 		if (z.getLeftChild().isNull() || z.getRightChild().isNull())
 			y = z;
 		else y = treeSuccessor(z);
@@ -133,8 +139,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		if (!compareTwoNodes(y, z)){
 			z.setKey(y.getKey());
 		}
+		System.out.println(sibling.getValue());
 		if (y.getColor() == Node.BLACK)
-			removeFixup(x);
+			removeFixup(x,sibling,parent);
 	}
 
 	private Node treeSuccessor(Node x){
@@ -157,68 +164,68 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
  
 	
-	private void removeFixup(Node toBeDeleted){
-		Node sibling=new Node();
+	private void removeFixup(Node toBeDeleted,Node sibling,Node parent){
+		//Node sibling=new Node();
 		while (!compareTwoNodes(toBeDeleted, root) && toBeDeleted.getColor() == Node.BLACK){
 			
 			if (compareTwoNodes(toBeDeleted, toBeDeleted.getParent().getLeftChild())){//check if the deleted node is a left child
-				sibling = (Node) toBeDeleted.getParent().getRightChild(); //getting sibling
+				//sibling = (Node) toBeDeleted.getParent().getRightChild(); //getting sibling
 				//case 1 sibling is red
 				if (sibling.getColor() == Node.RED){
 					sibling.setColor(Node.BLACK);
-					toBeDeleted.getParent().setColor(Node.RED);
-					rotateLeft((Node<T, V>) toBeDeleted.getParent());
-					sibling = (Node) toBeDeleted.getParent().getRightChild();
+					parent.setColor(Node.RED);
+					rotateLeft( parent);
+					sibling = (Node)parent.getRightChild();
 				}
 				//case 2 ,both sibling's children are black
 				if (sibling.getLeftChild().getColor() == Node.BLACK &&
 							sibling.getRightChild().getColor() == Node.BLACK){
 					sibling.setColor(Node.RED);
-					toBeDeleted = (Node) toBeDeleted.getParent();
+					toBeDeleted = (Node) parent;
 				}else{
 					//sibling's right child is black
 					if (sibling.getRightChild().getColor() == Node.BLACK){
 						sibling.getLeftChild().setColor(Node.BLACK);
 						sibling.setColor(Node.RED);
 						rotateRight(sibling);
-						sibling = (Node) toBeDeleted.getParent().getRightChild();
+						sibling = (Node) parent.getRightChild();
 					}
 					//sibling is black and it's right child is red
-					sibling.setColor(toBeDeleted.getParent().getColor());
-					toBeDeleted.getParent().setColor(Node.BLACK);
+					sibling.setColor(parent.getColor());
+					parent.setColor(Node.BLACK);
 					sibling.getRightChild().setColor(Node.BLACK);
-					rotateLeft((Node<T, V>) toBeDeleted.getParent());
+					rotateLeft((Node<T, V>) parent);
 					toBeDeleted = root;
 				}
 			}else{
 				//if the deleted is a right child
-				sibling = (Node) toBeDeleted.getParent().getLeftChild();
+				//sibling = (Node) toBeDeleted.getParent().getLeftChild();
 				
 				//case 1 sibling is red
 				if (sibling.getColor() == Node.RED){
 					sibling.setColor(Node.BLACK);
-					toBeDeleted.getParent().setColor(Node.RED);
-					rotateRight((Node) toBeDeleted.getParent());
-					sibling = (Node) toBeDeleted.getParent().getLeftChild();
+					parent.setColor(Node.RED);
+					rotateRight((Node) parent);
+					sibling = (Node) parent.getLeftChild();
 				}
 				//case 2 both sibling's children are black
 				if (sibling.getRightChild().getColor() == Node.BLACK &&
 							sibling.getLeftChild().getColor() == Node.BLACK){
 					sibling.setColor(Node.RED);
-					toBeDeleted = (Node) toBeDeleted.getParent();
+					toBeDeleted = (Node) parent;
 				}else{
 					//case 3 sibling's left child is black
 					 if (sibling.getLeftChild().getColor() == Node.BLACK){
 						sibling.getRightChild().setColor(Node.BLACK);
 						sibling.setColor(Node.RED);
 						rotateLeft(sibling);
-						sibling = (Node) toBeDeleted.getParent().getLeftChild();
+						sibling = (Node) parent.getLeftChild();
 					}
 					 //case 4 sibling is black and it's left is red
-					sibling.setColor(toBeDeleted.getParent().getColor());
-					toBeDeleted.getParent().setColor(Node.BLACK);
+					sibling.setColor(parent.getColor());
+					parent.setColor(Node.BLACK);
 					sibling.getLeftChild().setColor(Node.BLACK);
-					rotateRight((Node<T, V>) toBeDeleted.getParent());
+					rotateRight((Node<T, V>) parent);
 					toBeDeleted = root;
 				}
 			}
