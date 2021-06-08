@@ -334,7 +334,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	 * violation and fix it depending on the current violation*/
 	private void insertFix(Node<T,V> inserted) {
 		Node<T,V> uncle=inserted.getUncle();
-		Node<T,V> parent = (Node<T,V>)inserted.getParent()
+		Node<T,V> parent = (Node<T,V>)inserted.getParent();
 
 		if (parent.isBlack())
 			return;

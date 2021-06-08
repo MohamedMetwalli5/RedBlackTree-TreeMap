@@ -3,4 +3,5 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="FileStructuresLab1/src"/>
 	<classpathentry kind="output" path="FileStructuresLab1/bin"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 </classpath>
