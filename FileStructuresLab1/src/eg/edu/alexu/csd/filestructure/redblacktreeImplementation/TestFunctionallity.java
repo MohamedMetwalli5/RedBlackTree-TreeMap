@@ -15,7 +15,7 @@ public class TestFunctionallity {
 		Node <Integer,Integer>test3=new Node<Integer,Integer>(6,6,true,nil,nil);*/
 		RedBlackTree<Integer, Integer> T=new RedBlackTree();
 		leetInput(T);
-	
+
 		print( T.getRoot());
 	/*
 	    T.delete(27);

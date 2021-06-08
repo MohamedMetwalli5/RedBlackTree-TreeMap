@@ -9,6 +9,7 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 	private Node<T,V> parent;
 	private Node<T,V> rightChild;
 	private Node<T,V> leftChild;
+
 	
 	/*i will overload the constructor so we can 
 	 * have a nil constructor beside the original one 
@@ -110,5 +111,49 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 		
 		//assumption : null means that  doesn't have a value nor key
 	}
+
+	public boolean internalNode(){
+		return !rightChild.isNull() && !leftChild.isNull();
+	}
+
+	public boolean isRed(){
+		return color == Node.RED;
+	}
+	public boolean isBlack(){
+		return color == Node.BLACK;
+	}
+
+	public boolean isRightChild(){
+		if (this == parent.rightChild)
+			return true;
+		return false;
+	}
+
+	public boolean isLeftChild(){
+		if (this == parent.leftChild)
+			return true;
+		return false;
+	}
+	public Node<T,V>getUncle(){
+		return ((Node<T,V>)this.getParent()).getSibling();
+	}
+	public Node<T,V> clone(){
+		Node<T,V> new_node = new Node<T,V> (key, value,  color, rightChild, leftChild);
+		new_node.parent = parent;
+		return new_node;
+	}
+
+	public Node<T,V> getSibling(){
+		if (isLeftChild())
+			return parent.rightChild;
+		
+		return parent.leftChild;
+	}
+
+	public boolean isAligned(){
+		return (isLeftChild() && parent.isLeftChild() ) ||
+			(isRightChild() && parent.isRightChild());
+	}
+
 
 }
