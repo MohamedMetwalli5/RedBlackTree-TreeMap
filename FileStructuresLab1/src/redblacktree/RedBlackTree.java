@@ -1,4 +1,7 @@
-package eg.edu.alexu.csd.filestructure.redblacktreeImplementation;
+package redblacktree;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 import eg.edu.alexu.csd.filestructure.redblacktree.INode;
 import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
@@ -7,23 +10,22 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	private Node<T,V> nil = new Node<T,V>();
 	private Node<T,V> root = nil.clone();
+	public int size = 0;
 	@Override
 	public INode<T, V> getRoot() {
-		// TODO Auto-generated method stub
 		return this.root;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return this.root.isNull();
+		return size == 0;
 		//the root is nil
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
 		this.root = nil;
+		size = 0;
 	}
 
 	@Override
@@ -56,6 +58,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			root=new Node<T,V>(key,value,Node.BLACK,null,null);
 			root.setParent(nil);
 			giveNilChildren(root);
+			size++;
 			return;
 		}
 		
@@ -86,7 +89,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 		//call the fix up
 		insertFix(child);
- 		
+		
+		size++;
 	}
 
 	//<------------------------------------------------------------------------------------------------------------------------------------>	
@@ -100,12 +104,28 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	@Override
 	public boolean delete(T key) {
-		Node<T, V> toBeDeleted = searchNode(key);
-		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
+		Map.Entry<T, V> ret = poll(key);
+
+		if (ret == null)
 			return false;
 		
+		size--;
+		return true;
+		
+	}
 	
-		else if (toBeDeleted.internalNode()){
+	public Map.Entry<T,V> poll(T key) {
+		if (key == null)
+			return null;
+			
+		Node<T, V> toBeDeleted = searchNode(key);
+		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
+			return null;
+		
+		Map.Entry<T,V> ret = toBeDeleted.toEntry();
+		
+	
+		if (toBeDeleted.internalNode()){
 			Node<T,V> successor = minValue((Node<T,V>)toBeDeleted.getRightChild());
 
 			toBeDeleted.setKey(successor.getKey());
@@ -115,9 +135,10 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}else {
 			removeHelper(toBeDeleted);
 		}
-
-		return true;
 		
+		return ret;
+		
+
 	}
 	
 
@@ -159,16 +180,18 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
 
 
-	private Node<T,V> treeSuccessor(Node<T,V> x){
-		if (!x.getLeftChild().isNull()) {
-			return treeMinimum((Node) x.getRightChild());
-		}
-		Node result = (Node) x.getParent();
-		while (!result.isNull() && compareTwoNodes(x,result.getRightChild())){
-			x = result;
-			result = (Node) result.getParent();
-		}
-		return result;
+	public Node<T,V> getSuccessor(Node<T,V> x){
+		if (x.getRightChild().isNull()) 
+			return null;
+		
+		return minValue((Node<T, V>) x.getRightChild());
+	}
+	
+	public Node<T,V> getPredecessor(Node<T,V> x){
+		if (x.getLeftChild().isNull()) 
+			return null;
+		
+		return maxValue((Node<T, V>) x.getLeftChild());
 	}
 	
 	private Node treeMinimum(Node node){
@@ -177,6 +200,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 		return node;
 	}
+	
+	
+	// The smallest value in the subtree rooted at node
 	public  Node<T,V>  minValue(Node<T,V> node){
 	    Node<T,V>  current = node;
 	 
@@ -569,6 +595,17 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		nilnode1.setParent(node);
 		nilnode2.setParent(node);
 	}
+	
+    public void toArrayList (Node<T,V> node, ArrayList<Map.Entry<T,V>> arr){
+        if (node == null || node.isNull())
+            return;
+        
+        
+        toArrayList((Node<T,V>)node.getLeftChild(), arr);
+        arr.add(node.toEntry());
+        toArrayList((Node<T,V>)node.getRightChild(), arr);
+    }
+
 	
 
 }

@@ -1,4 +1,4 @@
-package eg.edu.alexu.csd.filestructure.redblacktreeImplementation;
+package redblacktree;
 
 
 import eg.edu.alexu.csd.filestructure.redblacktree.INode;
@@ -17,13 +17,27 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> ceilingEntry(T key) {
+        if (RBTree.size == 0)
+            return null;
 
-        return null;
+    	Node<T,V> node = RBTree.searchNode(key);
+    	if (node == null)
+    		return null;
+    	
+    	Node<T,V> predecssor = RBTree.getPredecessor(node);
+    	if (predecssor == null) // No successor
+    		return node.toEntry();
+    	else
+    		return predecssor.toEntry();
     }
 
     @Override
     public T ceilingKey(T key) {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+    	Map.Entry<T, V> ceilingEntr = ceilingEntry(key);
+    	return ceilingEntr.getKey();
     }
 
     @Override
@@ -62,27 +76,45 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> firstEntry() {
-        return leftMostChild(RBTree.getRoot());
+        if (RBTree.size == 0)
+            return null;
+
+    	Node<T,V> minNode = getMinNode();
+        return minNode.toEntry();
     }
 
-    Map.Entry<T,V> leftMostChild(INode node){
-		return null;
-
-    }
 
     @Override
     public T firstKey() {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+        return getMinNode().getKey();
     }
 
     @Override
     public Map.Entry<T, V> floorEntry(T key) {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+    	Node<T,V> node = RBTree.searchNode(key);
+    	if (node == null)
+    		return null;
+    	
+    	Node<T,V> successor = RBTree.getSuccessor(node);
+    	if (successor == null) // No successor
+    		return node.toEntry();
+    	else
+    		return successor.toEntry();
     }
 
     @Override
     public T floorKey(T key) {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+    	Map.Entry<T, V> floorEntry = floorEntry(key);
+    	return floorEntry.getKey();
     }
 
     @Override
@@ -92,13 +124,16 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public ArrayList<Map.Entry<T, V>> headMap(T toKey) {
-        return null;
+        return headMap(toKey, false);
     }
 
     @Override
     public ArrayList<Map.Entry<T, V>> headMap(T toKey, boolean inclusive) {
+
         return null;
+
     }
+    
 
     @Override
     public Set<T> keySet() {
@@ -128,22 +163,30 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public Map.Entry<T, V> lastEntry() {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+        Node<T,V> maxNode = getMaxNode();
+        return maxNode.toEntry();
     }
 
     @Override
     public T lastKey() {
-        return null;
+        if (RBTree.size == 0)
+            return null;
+
+    	Map.Entry<T,V> lastEntr = lastEntry();
+        return lastEntr.getKey();
     }
 
     @Override
     public Map.Entry<T, V> pollFirstEntry() {
-        return null;
+        return RBTree.poll(firstKey());
     }
 
     @Override
     public Map.Entry<T, V> pollLastEntry() {
-        return null;
+        return RBTree.poll(lastKey());
     }
 
     @Override
@@ -165,8 +208,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public int size() {
-        //return RBTree.size;
-    	return 0;
+        return RBTree.size;
     }
 
     @Override
@@ -174,9 +216,18 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
          return this.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
     }
 
-    public INode getRoot(){
-        return  RBTree.getRoot();
+    public Node<T,V> getRoot(){
+        return  (Node<T,V> )RBTree.getRoot();
     }
+    
+    Node<T,V> getMinNode(){
+    	return RBTree.minValue(getRoot());
+    }
+    
+    Node<T,V> getMaxNode(){
+    	return RBTree.maxValue(getRoot());
+    }
+    
 
     public static void main(String args[]){
         TreeMap<Integer,String> t = new TreeMap<>();
@@ -185,9 +236,10 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         t.put(10,"ahmed");
         t.put(5,"omar");
         RBTreePrinter.print(t.getRoot());
-        Set<Map.Entry<Integer,String>> s=  t.entrySet();
+        /*Set<Map.Entry<Integer,String>> s=  t.entrySet();
         t.values().forEach((String k)->{
             System.out.println(k);
-        });
+        });*/
+
     }
 }

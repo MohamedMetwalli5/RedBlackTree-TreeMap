@@ -1,4 +1,6 @@
-package eg.edu.alexu.csd.filestructure.redblacktreeImplementation;
+package redblacktree;
+
+import java.util.Map;
 
 import eg.edu.alexu.csd.filestructure.redblacktree.INode;
 
@@ -174,6 +176,10 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 		
 
 		return leftChild.isRed() ? leftChild : rightChild;
+	}
+	
+	Map.Entry<T, V> toEntry(){
+		return Map.entry(key, value);
 	}
 
 }

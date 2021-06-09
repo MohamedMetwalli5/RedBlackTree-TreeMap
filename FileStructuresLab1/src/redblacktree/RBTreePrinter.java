@@ -1,4 +1,4 @@
-package eg.edu.alexu.csd.filestructure.redblacktreeImplementation;
+package redblacktree;
 
 import java.util.ArrayList;
 import java.util.List;
