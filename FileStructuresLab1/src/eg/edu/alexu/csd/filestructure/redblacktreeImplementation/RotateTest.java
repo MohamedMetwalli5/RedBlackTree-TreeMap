@@ -9,17 +9,19 @@ class RotateTest {
 	@Test
 	void test() {
 		RedBlackTree<Integer, Integer> T=new RedBlackTree();
-		T.insert(1, 1);
-		T.insert(2, 2);
-		T.insert(6, 6);
-		TestFunctionallity.print(T.getRoot());
 		
-		T.insert(3, 3);
-		TestFunctionallity.print(T.getRoot());
+		int[] insert = new int[] {41, 38, 31, 12, 19, 8};
+		for (int x : insert) {
+			T.insert(x, x);
+			TestFunctionallity.print(T.getRoot());
 
-		T.insert(4, 4);
-		TestFunctionallity.print(T.getRoot());
-
+		}
+		
+		int[] delete = new int[] { 8, 12, 19, 31, 38, 41};
+		for (int x : delete) {
+			T.delete(x);
+			TestFunctionallity.print(T.getRoot());
+		}
 		/*
 				 P
 				  \

@@ -15,7 +15,6 @@ public class TestFunctionallity {
 		Node <Integer,Integer>test3=new Node<Integer,Integer>(6,6,true,nil,nil);*/
 		RedBlackTree<Integer, Integer> T=new RedBlackTree();
 		leetInput(T);
-	T.insert(58, 49);
 		print( T.getRoot());
 	/*
 	    T.delete(27);
@@ -71,17 +70,18 @@ public class TestFunctionallity {
 		
 		for( i=0;i<nums.length;i++) {
 			if(command[i].equals("remove")) {
-				/*System.out.println("number:" +nums[i][0]+" i "+i);
-				T.delete(nums[i][0]);*/
+				System.out.println("Remove:" +nums[i][0]+" i "+i);
+				T.delete(nums[i][0]);
 			}
 			else if(command[i].equals("get")) {
 				//System.out.println("getting:"+T.search(nums[i][0])+"shit");
 			}
 			else {
-				System.out.println("number:" +nums[i][0]+" "+nums[i][1]+" i "+i);
+				System.out.println("Insert:" +nums[i][0]+" "+nums[i][1]+" i "+i);
 				T.insert(nums[i][0],nums[i][1]);
-				print(T.getRoot());
+				
 			}
+			print(T.getRoot());
 		}
 		
 		System.out.println(i+",,"+command.length);

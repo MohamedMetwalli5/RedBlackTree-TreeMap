@@ -53,13 +53,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	@Override
 	public void insert(T key, V value) {
  		if(root.isNull()) {//inserting in empty tree
-		 	Node<T,V> new_nil1 =nil.clone();
-		 	Node<T,V> new_nil2 =nil.clone();
-			root=new Node<T,V>(key,value,Node.BLACK,new_nil1,new_nil2);
-			
-			new_nil1.setParent(root);
-			new_nil2.setParent(root);
+			root=new Node<T,V>(key,value,Node.BLACK,null,null);
 			root.setParent(nil);
+			giveNilChildren(root);
 			return;
 		}
 		
@@ -84,14 +80,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		child.setColor(Node.RED);
 		child.setKey(key);
 		child.setValue(value);
-
+		
 		// Make two nil nodes and connect them with child
-		Node<T, V> new_nil1 = new Node<>();
-		Node<T, V> new_nil2 = new Node<>();
-		new_nil1.setParent(child);
-		new_nil2.setParent(child);
-		child.setLeftChild(new_nil1);
-		child.setRightChild(new_nil2);
+		giveNilChildren(child);
 
 		//call the fix up
 		insertFix(child);
@@ -105,92 +96,74 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	Delete : 1 Child
 	Delete : 0 Children (children are nil)
 	*/
+
+
 	@Override
 	public boolean delete(T key) {
-		Node<T, V> u = searchNode(key);
-		if(u == null)   // if the tree doesn't contain the node to be deleted
+		Node<T, V> toBeDeleted = searchNode(key);
+		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
 			return false;
 		
-		if (u.internalNode()){
-			// get successor
-			// copy key and value
-			// removeHelper(successor)
+		if (root == toBeDeleted) {
+			root = nil;
+			return true;
+		}
+		else if (toBeDeleted.internalNode()){
+			Node<T,V> successor = minValue((Node<T,V>)toBeDeleted.getRightChild());
+			Node<T,V> predecessor = 
+			toBeDeleted.setKey(successor.getKey());
+			toBeDeleted.setValue(successor.getValue());
+			successor.setKey(null);
+			removeHelper(successor);
+			
 		}else {
-			removeHelper(u);
+			removeHelper(toBeDeleted);
 		}
 
 		return true;
 		
-		/*
-
-		if(compareTwoNodes(searchNode(key),root)) {
-			Node temp=inOrderSuccessor(root, root);
-			root.setKey((T) temp.getKey());
-			root.setValue((V) temp.getValue());
-			removeHelper(temp);
-			return true;
-		}
-		
-		else {
-			removeHelper(searchNode(key));
-			return true;
-		}
-		*/
 	}
 	
+
 	// Deletes a non internal node (has at most one child)
 	private void removeHelper(Node<T,V> toBeDeleted){
 		Node<T,V> z = toBeDeleted;
-		Node<T,V> child = z.getLeftChild().isNull() ? (Node<T,V>) z.getRightChild() : (Node<T,V>) z.getLeftChild();
 
+		
 
-		if (z.isRed() || child.isRed()){
+		if (z.isRed() || z.hasRedChild()){
 			// Case 1
+			
+			// Get the non nil child
+			Node<T,V> child = (Node<T, V>) (z.getLeftChild().isNull() ? 
+								z.getRightChild() :  z.getLeftChild());
+			
+			// Copy child's key and value to z
+			z.setKey(child.getKey());
+			z.setValue(child.getValue());
+			
+			// Set z's children to new nil nodes
+			giveNilChildren(z);
+			
+			z.setColor(Node.BLACK);
+			return;
 		}else {
-			// Double black
-			// Delete z and replace it with child
-			// child is now "Double black"
-			// fix double black(child)
+			// Both children are nil nodes
+			// Make z nil
+			// fix double black at z
+
+			z.setKey(null);
+			z.setValue(null);
+			z.setLeftChild(null);
+			z.setRightChild(null);
+			removeFixup(z);
 		}
 
 
-
-		Node<T,V> x = new Node<>(nil,nil); //nil
-		Node<T,V> y = new Node<>(nil,nil); //nil
-		Node<T,V> sibling=new Node<>(nil,nil);
-		
-		
-		if (compareTwoNodes(z,z.getParent().getLeftChild()))//check if the deleted node is a left child
-			sibling = (Node<T,V>) z.getParent().getRightChild(); //getting sibling
-		else
-			sibling = (Node<T,V>) z.getParent().getLeftChild();
-		
-			Node<T,V> parent=(Node<T,V>) z.getParent();
-		if (z.getLeftChild().isNull() || z.getRightChild().isNull())
-			y = z;
-		else y = treeSuccessor(z);
-		if (!y.getLeftChild().isNull()) {
-			x = (Node<T,V>) y.getLeftChild();
-		}else {
-			x = (Node<T,V>)y.getRightChild();
-		}
-		x.setParent(y.getParent());
-		if (y.getParent().isNull()) {
-			root = x;
-		}else if (!y.getParent().getLeftChild().isNull() && compareTwoNodes(y.getParent().getLeftChild(),y)) {
-			y.getParent().setLeftChild(x);
-		}else if (!y.getParent().getRightChild().isNull() && compareTwoNodes(y.getParent().getRightChild(),y)) {
-			y.getParent().setRightChild(x);
-		}
-		if (!compareTwoNodes(y, z)){
-			z.setKey(y.getKey());
-		}
-		
-		if (y.getColor() == Node.BLACK)
-			removeFixup(x,sibling,parent);
 	}
 
-	private Node treeSuccessor(Node x){
+
+	private Node<T,V> treeSuccessor(Node<T,V> x){
 		if (!x.getLeftChild().isNull()) {
 			return treeMinimum((Node) x.getRightChild());
 		}
@@ -208,25 +181,35 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 		return node;
 	}
-	public static Node minValue(Node node){
-	    Node current = node;
+	public  Node<T,V>  minValue(Node<T,V> node){
+	    Node<T,V>  current = node;
 	 
 	    /* loop down to find the leftmost leaf */
 	    while (!current.getLeftChild().isNull()){
-	        current = (Node) current.getLeftChild();
+	        current = (Node<T,V>)current.getLeftChild();
+	    }
+	    return current;
+	}
+	
+	public  Node<T,V>  maxValue(Node<T,V> node){
+	    Node<T,V>  current = node;
+	 
+	    /* loop down to find the rightmost leaf */
+	    while (!current.getRightChild().isNull()){
+	        current = (Node<T,V>)current.getRightChild();
 	    }
 	    return current;
 	}
 
-	public Node inOrderSuccessor(Node root, Node n){
+	public Node<T,V> inOrderSuccessor(Node<T,V> root, Node<T,V> n){
 	 
 	        // step 1 of the above algorithm
 	        if (!n.getRightChild().isNull()) {
-	            return minValue((Node) n.getRightChild());
+	            return minValue((Node<T,V>) n.getRightChild());
 	        }
 	 
 	        // step 2 of the above algorithm
-	        Node p = (Node) n.getParent();
+	        Node<T,V> p = (Node) n.getParent();
 	        while (!p.isNull() && compareTwoNodes(n,p.getRightChild())) {
 	            n = p;
 	            p = (Node) p.getParent();
@@ -235,8 +218,62 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
    }
 
 	
-	private void removeFixup(Node toBeDeleted,Node sibling,Node parent){
-		//Node sibling=new Node();
+	private void removeFixup(Node<T,V> toBeDeleted){
+		if (toBeDeleted == root) // Double black at the root is ignored
+			return;
+		
+		Node<T,V> sibling = toBeDeleted.getSibling();
+		Node<T,V> parent = (Node<T,V>)toBeDeleted.getParent();
+
+
+		if (sibling.isBlack() && sibling.hasRedChild()){
+			Node<T,V> redChild = sibling.getRedChild();
+
+			// Right Left / Left Right Case:
+			if (!redChild.isAligned()){
+				if (redChild.isLeftChild())
+					rotateRight(sibling);
+				else rotateLeft(sibling);
+
+				
+				sibling.setColor(Node.RED);
+				redChild.setColor(Node.BLACK);
+				removeFixup(toBeDeleted);
+				return;
+			}
+
+			// Right Right / Left Left Case:
+			redChild.setColor(Node.BLACK);
+			if (sibling.isRightChild())
+				rotateLeft(parent);
+			else rotateRight(parent);
+			
+			return;
+
+		}else if (sibling.isBlack() && !sibling.hasRedChild()){
+			sibling.setColor(Node.RED);
+			
+			if (parent.isRed()) {
+				parent.setColor(Node.BLACK);
+				return;
+			}else {
+				removeFixup(parent);
+				return;
+			}
+			
+		}else if (sibling.isRed()){
+			sibling.setColor(Node.BLACK);
+			parent.setColor(Node.RED);
+			
+			if (sibling.isRightChild())
+				rotateLeft(parent);
+			else rotateRight(parent);
+
+			removeFixup(toBeDeleted);
+			return;
+		}
+
+		/*
 		while (!compareTwoNodes(toBeDeleted, root) && toBeDeleted.getColor() == Node.BLACK){
 			
 			if (compareTwoNodes(toBeDeleted, toBeDeleted.getParent().getLeftChild())){//check if the deleted node is a left child
@@ -315,6 +352,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			
 		}
 		toBeDeleted.setColor(Node.BLACK);
+		*/
 	}
 	
 	public Node<T, V> searchNode(T key) {
@@ -343,12 +381,14 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			return;
 		}
 		
-		Node<T,V> uncle  = inserted.getUncle();
 		Node<T,V> parent = (Node<T,V>)inserted.getParent();
-		Node<T,V> grandParent = (Node<T,V>)parent.getParent();
-
 		if (parent.isBlack())
 			return;
+		
+		Node<T,V> grandParent = (Node<T,V>)parent.getParent();
+		Node<T,V> uncle  = inserted.getUncle();
+
+		
 
 		
 		// Case 1: uncle is Red
@@ -473,7 +513,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			p.setRightChild(lc);
 		else p.setLeftChild(lc);
 		toBeRotated.setParent(lc);
-
+		
+		System.out.println("Right rotation: " + toBeRotated.getKey());
+		TestFunctionallity.print(root);
 
 	}
 	private void rotateLeft(Node<T,V> toBeRotated) {
@@ -506,7 +548,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		else p.setLeftChild(rc);
 		toBeRotated.setParent(rc);
 
-		//TestFunctionallity.print(root);
+		System.out.println("Left rotation: " + toBeRotated.getKey());
+		TestFunctionallity.print(root);
 
 	}
 	
@@ -515,6 +558,15 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		if(B.isNull()||iNode.isNull())
 			return false;
 		return (iNode.getKey().compareTo(B.getKey())==0) ? true:false;
+	}
+	
+	private void giveNilChildren(Node<T,V> node) {
+		Node<T,V> nilnode1 = new Node<>();
+		Node<T,V> nilnode2 = new Node<>();
+		node.setRightChild(nilnode1);
+		node.setLeftChild(nilnode2);
+		nilnode1.setParent(node);
+		nilnode2.setParent(node);
 	}
 	
 
