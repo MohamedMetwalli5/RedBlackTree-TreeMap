@@ -1,151 +1,193 @@
 package eg.edu.alexu.csd.filestructure.redblacktreeImplementation;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
+import eg.edu.alexu.csd.filestructure.redblacktree.INode;
 import eg.edu.alexu.csd.filestructure.redblacktree.ITreeMap;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
-	@Override
-	public Entry<T, V> ceilingEntry(T key) {
-		// TODO Auto-generated method stub
+
+    RedBlackTree<T,V> RBTree;
+    TreeMap(){
+        RBTree = new RedBlackTree<T,V>();
+    }
+
+    @Override
+    public Map.Entry<T, V> ceilingEntry(T key) {
+
+        return null;
+    }
+
+    @Override
+    public T ceilingKey(T key) {
+        return null;
+    }
+
+    @Override
+    public void clear() {
+        RBTree.clear();
+    }
+
+    @Override
+    public boolean containsKey(T key) {
+        return RBTree.contains(key);
+    }
+
+    @Override
+    public boolean containsValue(V value) {
+        return this.values().contains(value);
+    }
+
+    @Override
+    public Set<Map.Entry<T, V>> entrySet() {
+        Set<Map.Entry<T, V>> set = new LinkedHashSet<>();
+        entrySet(RBTree.getRoot(), set);
+        return set;
+    }
+
+    private void entrySet(INode<T, V> node, Set<Map.Entry<T, V>> set) {
+        if (node == null || node.isNull()) {
+            return;
+        }
+        // left
+        entrySet(node.getLeftChild(), set);
+        // me
+        set.add( new AbstractMap.SimpleEntry<>(node.getKey(), node.getValue()) );
+        // right
+        entrySet(node.getRightChild(), set);
+    }
+
+    @Override
+    public Map.Entry<T, V> firstEntry() {
+        return leftMostChild(RBTree.getRoot());
+    }
+
+    Map.Entry<T,V> leftMostChild(INode node){
 		return null;
-	}
 
-	@Override
-	public T ceilingKey(T key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
+    @Override
+    public T firstKey() {
+        return null;
+    }
 
-	}
+    @Override
+    public Map.Entry<T, V> floorEntry(T key) {
+        return null;
+    }
 
-	@Override
-	public boolean containsKey(T key) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public T floorKey(T key) {
+        return null;
+    }
 
-	@Override
-	public boolean containsValue(V value) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public V get(T key) {
+        return (V) RBTree.search(key);
+    }
 
-	@Override
-	public Set<Entry<T, V>> entrySet() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ArrayList<Map.Entry<T, V>> headMap(T toKey) {
+        return null;
+    }
 
-	@Override
-	public Entry<T, V> firstEntry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public ArrayList<Map.Entry<T, V>> headMap(T toKey, boolean inclusive) {
+        return null;
+    }
 
-	@Override
-	public T firstKey() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Set<T> keySet() {
+        return keySet(RBTree.getRoot());
+    }
 
-	@Override
-	public Entry<T, V> floorEntry(T key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    private Set<T> keySet(INode node) {
+        if(node.isNull() || node == null){
+            return new HashSet<>();
+        }
 
-	@Override
-	public T floorKey(T key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        Set<T> set = new TreeSet<>();
+        Set<T> leftSet = new HashSet<>(), rightSet = new HashSet<>();
 
-	@Override
-	public V get(T key) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        if(!node.getLeftChild().isNull())
+            leftSet = keySet(node.getLeftChild());
 
-	@Override
-	public ArrayList<Entry<T, V>> headMap(T toKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        if(!node.getRightChild().isNull())
+            rightSet = keySet(node.getRightChild());
 
-	@Override
-	public ArrayList<Entry<T, V>> headMap(T toKey, boolean inclusive) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        set.addAll(leftSet);
+        set.add((T)node.getKey());
+        set.addAll(rightSet);
 
-	@Override
-	public Set<T> keySet() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        return set;
+    }
 
-	@Override
-	public Entry<T, V> lastEntry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Map.Entry<T, V> lastEntry() {
+        return null;
+    }
 
-	@Override
-	public T lastKey() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public T lastKey() {
+        return null;
+    }
 
-	@Override
-	public Entry<T, V> pollFirstEntry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Map.Entry<T, V> pollFirstEntry() {
+        return null;
+    }
 
-	@Override
-	public Entry<T, V> pollLastEntry() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Map.Entry<T, V> pollLastEntry() {
+        return null;
+    }
 
-	@Override
-	public void put(T key, V value) {
-		// TODO Auto-generated method stub
+    @Override
+    public void put(T key, V value) {
+        RBTree.insert(key,value);
+    }
 
-	}
+    @Override
+    public void putAll(Map<T, V> map) {
+        for (Map.Entry<T,V> entry : map.entrySet()){
+            RBTree.insert(entry.getKey(),entry.getValue());
+        }
+    }
 
-	@Override
-	public void putAll(Map<T, V> map) {
-		// TODO Auto-generated method stub
+    @Override
+    public boolean remove(T key) {
+        return RBTree.delete(key);
+    }
 
-	}
+    @Override
+    public int size() {
+        //return RBTree.size;
+    	return 0;
+    }
 
-	@Override
-	public boolean remove(T key) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public Collection<V> values() {
+         return this.entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
+    }
 
-	@Override
-	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public INode getRoot(){
+        return  RBTree.getRoot();
+    }
 
-	@Override
-	public Collection<V> values() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+    public static void main(String args[]){
+        TreeMap<Integer,String> t = new TreeMap<>();
+        t.put(-5,"mo");
+        t.put(20,"moaz");
+        t.put(10,"ahmed");
+        t.put(5,"omar");
+        RBTreePrinter.print(t.getRoot());
+        Set<Map.Entry<Integer,String>> s=  t.entrySet();
+        t.values().forEach((String k)->{
+            System.out.println(k);
+        });
+    }
 }
