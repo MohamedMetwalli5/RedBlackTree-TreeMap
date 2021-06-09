@@ -53,9 +53,12 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	@Override
 	public void insert(T key, V value) {
  		if(root.isNull()) {//inserting in empty tree
-		 	Node<T,V> nilLeaf =nil.clone();
-			nilLeaf.setParent(root);
-			root=new Node<T,V>(key,value,Node.BLACK,nilLeaf,nilLeaf.clone());
+		 	Node<T,V> new_nil1 =nil.clone();
+		 	Node<T,V> new_nil2 =nil.clone();
+			root=new Node<T,V>(key,value,Node.BLACK,new_nil1,new_nil2);
+			
+			new_nil1.setParent(root);
+			new_nil2.setParent(root);
 			root.setParent(nil);
 			return;
 		}
@@ -77,16 +80,18 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 
 
-		// make child red
-		// give him two nils
+		// make child red and give it the key and value
 		child.setColor(Node.RED);
 		child.setKey(key);
 		child.setValue(value);
 
-		Node<T, V> nilLeaf = nil.clone();
-		nilLeaf.setParent(child);
-		child.setLeftChild(nilLeaf);
-		child.setRightChild(nilLeaf.clone());
+		// Make two nil nodes and connect them with child
+		Node<T, V> new_nil1 = new Node<>();
+		Node<T, V> new_nil2 = new Node<>();
+		new_nil1.setParent(child);
+		new_nil2.setParent(child);
+		child.setLeftChild(new_nil1);
+		child.setRightChild(new_nil2);
 
 		//call the fix up
 		insertFix(child);
@@ -333,32 +338,55 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	/*takes the new inserted node and checks if there is a 
 	 * violation and fix it depending on the current violation*/
 	private void insertFix(Node<T,V> inserted) {
-		Node<T,V> uncle=inserted.getUncle();
+		if (inserted == root) {
+			root.setColor(Node.BLACK);
+			return;
+		}
+		
+		Node<T,V> uncle  = inserted.getUncle();
 		Node<T,V> parent = (Node<T,V>)inserted.getParent();
+		Node<T,V> grandParent = (Node<T,V>)parent.getParent();
 
 		if (parent.isBlack())
 			return;
 
 		
 		// Case 1: uncle is Red
+		if (uncle.isRed()) {
+			parent.setColor(Node.BLACK);
+			uncle.setColor(Node.BLACK);
+			grandParent.setColor(Node.RED);
+			insertFix(grandParent);
+			return;
+		}
 
 		// Case 2 , set up for case 3
 		if (!inserted.isAligned()){
 			if (parent.isLeftChild()){
-				inserted=parent;
+				// new problematic node is the parent after it's been rotated down
 				rotateLeft(parent);
+				insertFix(parent);
+				return;
 			}
 			else {
-
 				rotateRight(parent);
+				insertFix(parent);
+				return;
 			}
 			
 		}
 
 
 		//Case 3
-		
+		if (parent.isLeftChild()) 
+			rotateRight(grandParent);
+		else 
+			rotateLeft(grandParent);
 
+		grandParent.setColor(Node.RED);
+		parent.setColor(Node.BLACK);
+
+		/*
 		while(inserted.isRed()) {
 			//the parent of the inserted is a left child
 			if(((Node<T,V>)inserted.getParent()).isLeftChild()) {
@@ -411,14 +439,18 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 					
 			}
 		}
+		
 	}
 	root.setColor(Node.BLACK);
+	*/
 	}
-	private void rotateRight(Node<T,V> toBeRotated) {
+	
+	
+	public void rotateRight(Node<T,V> toBeRotated) {
 		/*
-				 P
-				  \
-				 toBeR (root)
+				   P
+				   |
+				 toBeR (might be root)
 				 /    \
 				lc    rc
 			   /  \
@@ -432,47 +464,48 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 		toBeRotated.setLeftChild(grc);
 		lc.setRightChild(toBeRotated);
-
-		if (toBeRotated.isRightChild())
+		lc.setParent(p);
+		
+		if (toBeRotated == root)  // the root's parent nil doesn't have root as its child
+			root = lc;
+		else if (toBeRotated.isRightChild())
 			p.setRightChild(lc);
 		else p.setLeftChild(lc);
+		toBeRotated.setParent(lc);
 
-		if (toBeRotated == root)
-			root = lc;
 
-		/*
-		(!(temp.getRightChild()==null))
-			temp.getRightChild().setParent(toBeRotated);
-		temp.setParent(toBeRotated.getParent());
-		//if the parent is nil so toBeRotated is the root so we modify it
-		if(toBeRotated.getParent().isNull())
-			this.root=temp;
-		else if(compareTwoNodes(toBeRotated.getParent().getRightChild(),toBeRotated))//toBeRotated is a right child
-			toBeRotated.getParent().setRightChild(temp);
-		else //toBeRotated is  a left child
-			toBeRotated.getParent().setLeftChild(temp);
-		temp.setRightChild(toBeRotated);
-		toBeRotated.setParent(temp);
-		*/
 	}
 	private void rotateLeft(Node<T,V> toBeRotated) {
 		
-		Node <T,V> temp=(Node<T, V>) toBeRotated.getRightChild();
-		toBeRotated.setRightChild(temp.getLeftChild());
+		/*
+			   P
+			   |
+			 toBeR (might be root)
+			 /    \
+			lc    rc
+			     /  \
+			   glc  grc
+		*/
+		
+		Node <T,V> p = (Node<T, V>) toBeRotated.getParent();
+		Node <T,V> rc= (Node<T, V>) toBeRotated.getRightChild();
+		
+		Node <T,V> glc= (Node<T, V>) rc.getLeftChild();
 		
 		
-		if(!(temp.getLeftChild()==null))
-			temp.getLeftChild().setParent(toBeRotated);
-		temp.setParent(toBeRotated.getParent());
-		//if the parent is nil so toBeRotated is the root so we modify it
-		if(toBeRotated.getParent().isNull())
-			this.root=temp;
-		else if(compareTwoNodes(toBeRotated.getParent().getLeftChild(),toBeRotated))//toBeRotated is a left child
-			toBeRotated.getParent().setLeftChild(temp);
-		else //toBeRotated is  a right child
-			toBeRotated.getParent().setRightChild(temp);
-		temp.setLeftChild(toBeRotated);
-		toBeRotated.setParent(temp);
+		toBeRotated.setRightChild(glc);
+		rc.setLeftChild(toBeRotated);
+		rc.setParent(p);
+		
+		if (toBeRotated == root)  // the root's parent nil doesn't have root as its child
+			root = rc;
+		else if (toBeRotated.isRightChild())
+			p.setRightChild(rc);
+		else p.setLeftChild(rc);
+		toBeRotated.setParent(rc);
+
+		TestFunctionallity.print(root);
+
 	}
 	
 	//return true if the two nodes have the same key(means that they are the same node)
