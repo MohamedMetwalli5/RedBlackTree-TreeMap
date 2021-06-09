@@ -1,9 +1,11 @@
-package redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.INode;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.INode;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.ITreeMap;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.RedBlackTree;
 
 public class TestFunctionallity {
 
@@ -13,9 +15,9 @@ public class TestFunctionallity {
 		/*Node <Integer,Integer>test2 =new Node<Integer,Integer>(5,5,true,nil,nil);
 		Node  <Integer,Integer>temp=test2;
 		Node <Integer,Integer>test3=new Node<Integer,Integer>(6,6,true,nil,nil);*/
-		RedBlackTree<Integer, Integer> T=new RedBlackTree();
+		RedBlackTree<Integer, Integer> T=new RedBlackTree<>();
 		leetInput(T);
-		print( T.getRoot());
+		// print( T.getRoot());
 	/*
 	    T.delete(27);
 		T.insert(65, 65);

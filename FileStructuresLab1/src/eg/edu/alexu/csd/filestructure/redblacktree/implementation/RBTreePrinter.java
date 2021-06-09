@@ -1,9 +1,9 @@
-package redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.implementation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.INode;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.*;
 
 /**
  * this code was copied and modified for

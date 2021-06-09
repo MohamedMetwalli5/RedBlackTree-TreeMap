@@ -1,12 +1,10 @@
-package eg.edu.alexu.csd.filestructure.redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.test;
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
-import eg.edu.alexu.csd.filestructure.redblacktree.ITreeMap;
-import eg.edu.alexu.csd.filestructure.redblacktree.ReflectionHelper;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.*;
 
 public class IntegrationTest {
 

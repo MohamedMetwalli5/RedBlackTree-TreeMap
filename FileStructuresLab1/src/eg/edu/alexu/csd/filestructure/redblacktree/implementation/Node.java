@@ -1,8 +1,6 @@
-package redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.implementation;
 
 import java.util.Map;
-
-import eg.edu.alexu.csd.filestructure.redblacktree.INode;
 
 public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 	private T key;

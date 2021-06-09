@@ -1,10 +1,11 @@
-package redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import redblacktree.TestFunctionallity;
+import eg.edu.alexu.csd.filestructure.redblacktree.test.TestFunctionallity;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.RedBlackTree;
 class RotateTest {
 
 	@Test

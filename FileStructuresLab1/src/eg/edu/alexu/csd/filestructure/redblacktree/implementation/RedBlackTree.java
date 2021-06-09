@@ -1,10 +1,11 @@
-package redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.implementation;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.INode;
-import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
+import javax.management.RuntimeErrorException;
+
+import eg.edu.alexu.csd.filestructure.redblacktree.test.TestFunctionallity;
 
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
@@ -29,11 +30,13 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
 
 	@Override
-	public V search(T comparable) {
+	public V search(T comparable) throws RuntimeErrorException {
+		if(comparable == null)
+			throw new RuntimeErrorException(null);
 		// TODO Auto-generated method stub
 		Node<T,V> temp =new Node<T,V>(root.getKey(),root.getValue(),root.getColor(),root.getRightChild(),root.getLeftChild());
 		
-		while(!temp.isNull()) {
+		while(temp == null || !temp.isNull()) {
 			if(temp.getKey().compareTo(comparable)==0)
 				return temp.getValue();
 			else if(temp.getKey().compareTo(comparable)<0) {
@@ -48,12 +51,16 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	@Override
 	public boolean contains(T key) {
+		if(key == null)
+			throw new RuntimeErrorException(null);
 		// TODO Auto-generated method stub
-		return (search(key)==null) ?false:true;
+		return (searchNode(key)==null) ?false:true;
 	}
 
 	@Override
 	public void insert(T key, V value) {
+		if(key == null || value == null)
+			throw new RuntimeErrorException(null);
  		if(root.isNull()) {//inserting in empty tree
 			root=new Node<T,V>(key,value,Node.BLACK,null,null);
 			root.setParent(nil);
@@ -104,6 +111,9 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	@Override
 	public boolean delete(T key) {
+		if(key == null)
+			throw new RuntimeErrorException(null);
+
 		Map.Entry<T, V> ret = poll(key);
 
 		if (ret == null)
@@ -126,7 +136,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		
 	
 		if (toBeDeleted.internalNode()){
-			Node<T,V> successor = minValue((Node<T,V>)toBeDeleted.getRightChild());
+			Node<T,V> successor = (Node<T,V>)minValue(toBeDeleted.getRightChild());
 
 			toBeDeleted.setKey(successor.getKey());
 			toBeDeleted.setValue(successor.getValue());
@@ -180,18 +190,18 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
 
 
-	public Node<T,V> getSuccessor(Node<T,V> x){
+	public INode<T,V> getSuccessor(Node<T,V> x){
 		if (x.getRightChild().isNull()) 
 			return null;
 		
-		return minValue((Node<T, V>) x.getRightChild());
+		return minValue(x.getRightChild());
 	}
 	
-	public Node<T,V> getPredecessor(Node<T,V> x){
+	public INode<T,V> getPredecessor(Node<T,V> x){
 		if (x.getLeftChild().isNull()) 
 			return null;
 		
-		return maxValue((Node<T, V>) x.getLeftChild());
+		return maxValue(x.getLeftChild());
 	}
 	
 	private Node treeMinimum(Node node){
@@ -203,38 +213,38 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	
 	
 	// The smallest value in the subtree rooted at node
-	public  Node<T,V>  minValue(Node<T,V> node){
-	    Node<T,V>  current = node;
+	public  INode<T,V>  minValue(INode<T,V> node){
+	    INode<T,V>  current = node;
 	 
 	    /* loop down to find the leftmost leaf */
 	    while (!current.getLeftChild().isNull()){
-	        current = (Node<T,V>)current.getLeftChild();
+	        current = current.getLeftChild();
 	    }
 	    return current;
 	}
 	
-	public  Node<T,V>  maxValue(Node<T,V> node){
-	    Node<T,V>  current = node;
+	public  INode<T,V>  maxValue(INode<T,V> node){
+	    INode<T,V>  current = node;
 	 
 	    /* loop down to find the rightmost leaf */
 	    while (!current.getRightChild().isNull()){
-	        current = (Node<T,V>)current.getRightChild();
+	        current = current.getRightChild();
 	    }
 	    return current;
 	}
 
-	public Node<T,V> inOrderSuccessor(Node<T,V> root, Node<T,V> n){
+	public INode<T,V> inOrderSuccessor(Node<T,V> root, Node<T,V> n){
 	 
 	        // step 1 of the above algorithm
 	        if (!n.getRightChild().isNull()) {
-	            return minValue((Node<T,V>) n.getRightChild());
+	            return minValue(n.getRightChild());
 	        }
 	 
 	        // step 2 of the above algorithm
-	        Node<T,V> p = (Node) n.getParent();
+	        Node<T,V> p = (Node<T,V>) n.getParent();
 	        while (!p.isNull() && compareTwoNodes(n,p.getRightChild())) {
 	            n = p;
-	            p = (Node) p.getParent();
+	            p = (Node<T,V>) p.getParent();
 	        }
 	        return p;
    }
@@ -541,8 +551,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		else p.setLeftChild(lc);
 		toBeRotated.setParent(lc);
 		
-		System.out.println("Right rotation: " + toBeRotated.getKey());
-		TestFunctionallity.print(root);
+		// System.out.println("Right rotation: " + toBeRotated.getKey());
+		// TestFunctionallity.print(root);
 
 	}
 	private void rotateLeft(Node<T,V> toBeRotated) {
@@ -575,8 +585,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		else p.setLeftChild(rc);
 		toBeRotated.setParent(rc);
 
-		System.out.println("Left rotation: " + toBeRotated.getKey());
-		TestFunctionallity.print(root);
+		// System.out.println("Left rotation: " + toBeRotated.getKey());
+		// TestFunctionallity.print(root);
 
 	}
 	

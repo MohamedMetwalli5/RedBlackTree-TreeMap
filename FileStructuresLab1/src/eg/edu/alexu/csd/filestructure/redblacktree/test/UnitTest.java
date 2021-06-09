@@ -1,4 +1,4 @@
-package eg.edu.alexu.csd.filestructure.redblacktree;
+package eg.edu.alexu.csd.filestructure.redblacktree.test;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,11 +22,13 @@ import javax.management.RuntimeErrorException;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.IRedBlackTree;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.INode;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.IRedBlackTree;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.ITreeMap;
 
 
 public class UnitTest {
-	private final boolean debug = false;
+	private final boolean debug = true;
 
 	/** 
 	 * test get a null root.
@@ -533,6 +535,8 @@ public class UnitTest {
 			INode<Integer, String> node = redBlackTree.getRoot();
 			if ((node == null || node.isNull()))
 				Assert.fail();
+
+			System.out.println(node.getRightChild().getColor() == INode.BLACK);
 			Assert.assertTrue(verifyProps(node));
 		} catch (Throwable e) {
 			TestRunner.fail("Fail to handle deletion", e);
@@ -1284,14 +1288,17 @@ public class UnitTest {
 			int toKey = keys.get(r.nextInt(keys.size()));
 			ArrayList<Map.Entry<Integer, String>> ans = treemap.headMap(toKey);
 			ArrayList<Map.Entry<Integer, String>> realAns = new ArrayList<>(t.headMap(toKey).entrySet());
+			// System.out.println(realAns);
 			Collections.sort(realAns, new Comparator<Map.Entry<Integer, String>>() {
 				@Override
 				public int compare(Map.Entry<Integer, String> o1, Map.Entry<Integer, String> o2) {
 					return o1.getKey() - o2.getKey();
 				}
 			});
-			for (int i = 0; i < ans.size(); i++) 
+			for (int i = 0; i < ans.size(); i++){
+				System.out.println(i);
 				Assert.assertEquals(ans.get(i), realAns.get(i));
+			}
 		} catch (Throwable e) {
  			TestRunner.fail("Fail in headMap", e);
 		}
