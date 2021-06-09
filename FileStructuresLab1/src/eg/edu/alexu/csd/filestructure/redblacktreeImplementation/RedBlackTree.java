@@ -338,7 +338,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	/*takes the new inserted node and checks if there is a 
 	 * violation and fix it depending on the current violation*/
 	private void insertFix(Node<T,V> inserted) {
-		if (inserted == root) {
+		if (inserted == root && root.isRed()) {
 			root.setColor(Node.BLACK);
 			return;
 		}
@@ -377,7 +377,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		}
 
 
-		//Case 3
+		//Case 3 root->>
 		if (parent.isLeftChild()) 
 			rotateRight(grandParent);
 		else 
@@ -448,7 +448,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	
 	public void rotateRight(Node<T,V> toBeRotated) {
 		/*
-				   P
+				  P 
 				   |
 				 toBeR (might be root)
 				 /    \
@@ -463,6 +463,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 
 		toBeRotated.setLeftChild(grc);
+		grc.setParent(toBeRotated);
 		lc.setRightChild(toBeRotated);
 		lc.setParent(p);
 		
@@ -494,6 +495,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		
 		
 		toBeRotated.setRightChild(glc);
+		glc.setParent(toBeRotated);
 		rc.setLeftChild(toBeRotated);
 		rc.setParent(p);
 		
@@ -504,7 +506,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		else p.setLeftChild(rc);
 		toBeRotated.setParent(rc);
 
-		TestFunctionallity.print(root);
+		//TestFunctionallity.print(root);
 
 	}
 	
