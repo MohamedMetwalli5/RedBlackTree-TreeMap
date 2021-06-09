@@ -240,6 +240,11 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 			// Right Right / Left Left Case:
 			redChild.setColor(Node.BLACK);
+			
+			if (parent.isRed()) {
+				parent.setColor(Node.BLACK);
+				sibling.setColor(Node.RED);
+			}
 			if (sibling.isRightChild())
 				rotateLeft(parent);
 			else rotateRight(parent);
