@@ -104,16 +104,12 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
 			return false;
 		
-		if (root == toBeDeleted) {
-			root = nil;
-			return true;
-		}
+	
 		else if (toBeDeleted.internalNode()){
 			Node<T,V> successor = minValue((Node<T,V>)toBeDeleted.getRightChild());
-			Node<T,V> predecessor = 
+
 			toBeDeleted.setKey(successor.getKey());
 			toBeDeleted.setValue(successor.getValue());
-			successor.setKey(null);
 			removeHelper(successor);
 			
 		}else {
