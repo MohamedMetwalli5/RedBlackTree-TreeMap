@@ -5,14 +5,11 @@ import java.util.Map;
 
 import javax.management.RuntimeErrorException;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.test.TestFunctionallity;
-import junit.framework.Test;
-
 
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
-	private Node<T,V> nil = new Node<T,V>();
-	private Node<T,V> root = nil.clone();
+	private final INode<T,V> NIL = new Node<T,V>();
+	private INode<T,V> root = new Node<T,V>();
 	public int size = 0;
 	@Override
 	public INode<T, V> getRoot() {
@@ -27,7 +24,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	@Override
 	public void clear() {
-		this.root = nil;
+		this.root = NIL;
 		size = 0;
 	}
 
@@ -35,7 +32,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	public V search(T comparable) throws RuntimeErrorException {
 		if(comparable == null)
 			throw new RuntimeErrorException(null);
-		// TODO Auto-generated method stub
 		Node<T,V> temp =new Node<T,V>(root.getKey(),root.getValue(),root.getColor(),root.getRightChild(),root.getLeftChild());
 		
 		while(temp == null || !temp.isNull()) {
@@ -55,7 +51,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	public boolean contains(T key) {
 		if(key == null)
 			throw new RuntimeErrorException(null);
-		// TODO Auto-generated method stub
 		return (searchNode(key)==null) ?false:true;
 	}
 
@@ -65,14 +60,14 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			throw new RuntimeErrorException(null);
  		if(root.isNull()) {//inserting in empty tree
 			root=new Node<T,V>(key,value,Node.BLACK,null,null);
-			root.setParent(nil);
+			root.setParent(NIL);
 			giveNilChildren(root);
 			size++;
 			return;
 		}
 		
- 		Node<T,V> temp=root;
- 		Node<T,V> child=temp;
+ 		INode<T,V> temp = root;
+ 		INode<T,V> child = temp;
  		while(!child.isNull()) {
  			temp=child;
 			if(temp.getKey().compareTo(key)<0) {
@@ -97,7 +92,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		giveNilChildren(child);
 
 		//call the fix up
-		insertFix(child);
+		insertFix((Node<T, V>) child);
 		
 		size++;
 	}
@@ -129,7 +124,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		if (key == null)
 			return null;
 			
-		Node<T, V> toBeDeleted = searchNode(key);
+		Node<T, V> toBeDeleted = (Node<T, V>) searchNode(key);
 		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
 			return null;
 
@@ -265,11 +260,8 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 		if (sibling.isBlack() && sibling.hasRedChild()){
 			Node<T,V> redChild = sibling.getRedChild();
-			//System.out.println("Sibling " + sibling.getKey() + " and has red child : " + redChild.getKey());
 
-			// Right Left / Left Right Case:
 			if (!redChild.isAligned()){
-				//System.out.println("Red child isn't aligned");
 				if (redChild.isLeftChild())
 					rotateRight(sibling);
 				else rotateLeft(sibling);
@@ -277,17 +269,12 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 				
 				sibling.setColor(Node.RED);
 				redChild.setColor(Node.BLACK);
-				//System.out.println("Non alignment fix : ");
-				//TestFunctionallity.print(root);
 			}
 
 
 			// Right Right / Left Left Case:
-			//System.out.println("Right Right /Left Left");
 			sibling = doubleBlack.getSibling();
 			redChild = sibling.getRedChild();
-			//System.out.println("Parent " + doubleBlack.getParent().getKey());
-			//System.out.println("????Sibling " + sibling.getKey() + " and has red child : " + redChild.getKey());
 
 			redChild.setColor(Node.BLACK);
 			sibling.setColor(parent.getColor());
@@ -295,11 +282,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			if (sibling.isRightChild())
 				rotateLeft(parent);
 			else rotateRight(parent);
-			
-			//System.out.println("After rotation : ");
-			//TestFunctionallity.print(root);
-			//System.out.println("Sibling after rotation : " + sibling.getKey());
-
 			
 			return;
 
@@ -328,16 +310,13 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 
 	}
 	
-	public Node<T, V> searchNode(T key) {
-		Node<T,V> temp = root;
+	public INode<T, V> searchNode(T key) {
+		INode<T,V> temp = root;
 		if (root.isNull())
 			return null;
 
 		while(!temp.isNull()) {
 			if(temp.getKey().compareTo(key) == 0) {
-				if (temp.isNull()){
-					System.out.println("A7aaaaaaaaaaaaaaaaaa");
-				}
 				return temp;
 			}else if(temp.getKey().compareTo(key)<0) {
 				temp = (Node<T, V>) temp.getRightChild();
@@ -356,7 +335,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	/*takes the new inserted node and checks if there is a 
 	 * violation and fix it depending on the current violation*/
 	private void insertFix(Node<T,V> inserted) {
-		if (inserted == root && root.isRed()) {
+		if (inserted == root && root.getColor() == INode.RED) {
 			root.setColor(Node.BLACK);
 			return;
 		}
@@ -435,10 +414,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			p.setRightChild(lc);
 		else p.setLeftChild(lc);
 		toBeRotated.setParent(lc);
-		
-		// System.out.println("Right rotation: " + toBeRotated.getKey());
-		// TestFunctionallity.print(root);
-
 	}
 	private void rotateLeft(Node<T,V> toBeRotated) {
 		
@@ -470,9 +445,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		else p.setLeftChild(rc);
 		toBeRotated.setParent(rc);
 
-		// System.out.println("Left rotation: " + toBeRotated.getKey());
-		// TestFunctionallity.print(root);
-
 	}
 	
 	//return true if the two nodes have the same key(means that they are the same node)
@@ -482,7 +454,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		return (iNode.getKey().compareTo(B.getKey())==0) ? true:false;
 	}
 	
-	private void giveNilChildren(Node<T,V> node) {
+	private void giveNilChildren(INode<T,V> node) {
 		Node<T,V> nilnode1 = new Node<>();
 		Node<T,V> nilnode2 = new Node<>();
 		node.setRightChild(nilnode1);
@@ -491,19 +463,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		nilnode2.setParent(node);
 	}
 	
-	private void disconnectNilChildren(Node<T,V> node) {
-		if (node == null)
-			return;
-
-		Node<T,V> parent = (Node<T, V>) node.getParent();
-		if (node.isLeftChild()) {
-			parent.setLeftChild(null);
-		}else {
-			parent.setRightChild(null);
-		}
-
-
-	}
+	
 	
     public void toArrayList (Node<T,V> node, ArrayList<Map.Entry<T,V>> arr){
         if (node == null || node.isNull())

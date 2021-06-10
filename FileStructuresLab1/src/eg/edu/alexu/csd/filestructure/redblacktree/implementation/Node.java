@@ -163,11 +163,6 @@ public class Node<T extends Comparable<T>, V> implements INode<T, V> {
 
 
 	public Node<T,V> getRedChild(){
-		if (!hasRedChild()){
-			System.out.println("GetRedChild of node that doesn't have red children\n");
-			System.out.println("Key, Value : " + key + ", " + value +"\n");
-		}
-
 		// If both are red, prefer the aligned child
 		if (leftChild.isRed() && rightChild.isRed())
 			return leftChild.isAligned() ? leftChild : rightChild;

@@ -7,7 +7,7 @@ class RotateTest {
 
 	@Test
 	void test() {
-		RedBlackTree<Integer, Integer> T=new RedBlackTree();
+		RedBlackTree<Integer, Integer> T=new RedBlackTree<>();
 		
 		int[] insert = new int[] {41, 38, 31, 12, 19, 8};
 		for (int x : insert) {

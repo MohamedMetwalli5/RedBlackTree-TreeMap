@@ -13,9 +13,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         RBTree = new RedBlackTree<T, V>();
     }
 
-
-    private Node<T,V> ceilingNode(T key)
-    {
+    private Node<T, V> ceilingNode(T key) {
         if (key == null)
             throw new RuntimeErrorException(null);
 
@@ -23,7 +21,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         while (root != null && !root.isNull()) {
             int comparison = key.compareTo(root.getKey());
             if (comparison == 0)
-                return (Node<T, V>)root;
+                return (Node<T, V>) root;
             else if (comparison < 0) {
                 parent = root;
                 root = root.getLeftChild();
@@ -32,13 +30,13 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         }
         if (parent == null || parent.isNull())
             return null;
-        return (Node<T,V>)parent;
+        return (Node<T, V>) parent;
     }
 
     @Override
     public Map.Entry<T, V> ceilingEntry(T key) {
-        Node<T,V> node = ceilingNode(key);
-        if(node == null)
+        Node<T, V> node = ceilingNode(key);
+        if (node == null)
             return null;
         return node.toEntry();
     }
@@ -101,8 +99,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         return getMinNode().getKey();
     }
 
-    private Node<T,V> floorNode(T key)
-    {
+    private Node<T, V> floorNode(T key) {
         if (key == null)
             throw new RuntimeErrorException(null);
 
@@ -110,7 +107,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         while (root != null && !root.isNull()) {
             int comparison = key.compareTo(root.getKey());
             if (comparison == 0)
-                return (Node<T, V>)root;
+                return (Node<T, V>) root;
             else if (comparison > 0) {
                 parent = root;
                 root = root.getRightChild();
@@ -119,22 +116,21 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         }
         if (parent == null || parent.isNull())
             return null;
-        return (Node<T,V>)parent;
+        return (Node<T, V>) parent;
     }
-
 
     @Override
     public Map.Entry<T, V> floorEntry(T key) {
-        Node<T,V> node = (Node<T,V>) floorNode(key);
-        if(node == null)
+        Node<T, V> node = (Node<T, V>) floorNode(key);
+        if (node == null)
             return null;
         return node.toEntry();
     }
 
     @Override
     public T floorKey(T key) {
-        Node<T,V> node = (Node<T,V>) floorNode(key);
-        if(node == null)
+        Node<T, V> node = (Node<T, V>) floorNode(key);
+        if (node == null)
             return null;
         return node.getKey();
     }
@@ -144,47 +140,29 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         return (V) RBTree.search(key);
     }
 
-    @Override
-    public ArrayList<Map.Entry<T, V>> headMap(T toKey) {
-        return headMap(toKey, false);
-    }
-
-    public void headMapHelper(ArrayList<Map.Entry<T, V>> arr, Node<T,V> node)
-    {
-        if(node == null || node.isNull())
+    private void headMapHelper(ArrayList<Map.Entry<T, V>> arr, INode<T, V> root, T key, boolean inclusive) {
+        if (root == null || root.isNull())
             return;
-        System.out.println("Root: " + node.getKey() + ", left: " + node.getLeftChild() + ", right: " + node.getRightChild());
-        
-        headMapHelper(arr, (Node<T,V>)node.getLeftChild());
-        arr.add(node.toEntry());
-        headMapHelper(arr, (Node<T,V>)node.getRightChild());
+        int comparison = key.compareTo(root.getKey());
+        if (comparison >= 0) {
+            headMapHelper(arr, root.getLeftChild(), key, inclusive);
+            if (inclusive || comparison != 0)
+                arr.add(((Node<T, V>) root).toEntry());
+            headMapHelper(arr, root.getRightChild(), key, inclusive);
+        } else
+            headMapHelper(arr, root.getLeftChild(), key, inclusive);
     }
 
     @Override
     public ArrayList<Map.Entry<T, V>> headMap(T toKey, boolean inclusive) {
         ArrayList<Map.Entry<T, V>> ans = new ArrayList<>();
-        Node<T,V> node = floorNode(toKey);
-
-        if(node == null)
-            return null;
-
-        System.out.println("floor key: " + node.getKey() + ", toKey: " + toKey);
-        int comparison = node.getKey().compareTo(toKey);
-        if(comparison == 0)
-            headMapHelper(ans, (Node<T,V>) node.getLeftChild());
-        else
-            headMapHelper(ans, node);
-
-        if(inclusive && comparison == 0)
-            ans.add(node.toEntry());
-        
-        // System.out.println(toKey);
-        // System.out.println(ans);
-        if(ans.size() == 0)
-            return null;
-        
+        headMapHelper(ans, RBTree.getRoot(), toKey, inclusive);
         return ans;
+    }
 
+    @Override
+    public ArrayList<Map.Entry<T, V>> headMap(T toKey) {
+        return headMap(toKey, false);
     }
 
     @Override
@@ -192,7 +170,7 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         return keySet(RBTree.getRoot());
     }
 
-    private Set<T> keySet(INode node) {
+    private Set<T> keySet(INode<T,V> node) {
         if (node.isNull() || node == null) {
             return new HashSet<>();
         }
@@ -282,19 +260,4 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         return RBTree.maxValue(getRoot());
     }
 
-    public static void main(String args[]) {
-        TreeMap<Integer, String> t = new TreeMap<>();
-        t.put(-5, "mo");
-        t.put(20, "moaz");
-        t.put(10, "ahmed");
-        t.put(5, "omar");
-        //RBTreePrinter.print(t.getRoot());
-        /*
-         * Set<Map.Entry<Integer,String>> s= t.entrySet(); t.values().forEach((String
-         * k)->{ System.out.println(k); });
-         */
-        ArrayList<Map.Entry<Integer,String>> arr = new ArrayList<Map.Entry<Integer,String>>();
-        t.headMapHelper(arr, t.getRoot());
-        System.out.println(arr);
-    }
 }
