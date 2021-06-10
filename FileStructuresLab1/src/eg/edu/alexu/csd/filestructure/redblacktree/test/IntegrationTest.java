@@ -1,10 +1,12 @@
 package eg.edu.alexu.csd.filestructure.redblacktree.test;
+
 import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import eg.edu.alexu.csd.filestructure.redblacktree.implementation.*;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.IRedBlackTree;
+import eg.edu.alexu.csd.filestructure.redblacktree.implementation.ITreeMap;
 
 public class IntegrationTest {
 
@@ -19,12 +21,11 @@ public class IntegrationTest {
     	Assert.assertEquals("You have more than one public implementation of the interface", 1, candidateClasses.size());
     }
     
-    
+    @Test
     public void testCreationTreeMap() {	
     	List<Class<?>> candidateClasses = ReflectionHelper.findClassesImplementing(treeMapInterfaceToTest, treeMapInterfaceToTest.getPackage());
     	Assert.assertNotNull("Failed to create instance using interface '" + treeMapInterfaceToTest.getName() + "' !", candidateClasses);
     	Assert.assertEquals("You have more than one public implementation of the interface", 1, candidateClasses.size());
     }
-    
 
 }

@@ -1675,6 +1675,7 @@ public class UnitTest {
 		while(!q.isEmpty()) {
 			Field cur = q.poll();
 			
+			System.out.println("field name " + cur.getType());
 			if (cur.getType().isPrimitive()) continue;
 			
 			if (cur.getType().isAssignableFrom(TreeMap.class))
