@@ -496,18 +496,27 @@ public class UnitTest {
 		try {
 			Random r = new Random();
 			HashSet<Integer> list = new HashSet<>();
-			for (int i = 0; i < 100000; i++) {
+			//ArrayList<Integer> entered = new ArrayList<>(List.of(2391, 9913, 2905, 9208, 8812, 5657, 8846, 6410, 3044, 5831));
+			for (int i = 0; i < 1000000; i++) {
 				int key = r.nextInt(10000);
+				//int key = entered.get(i);
 				list.add(key);
+				//entered.add(key);
 				redBlackTree.insert(key, "soso" + key);
 			}
-			
-			for (Integer elem : list) 
+			//System.out.println(entered);
+			int i = 0;
+			for (Integer elem : list) {
+				//System.out.println(elem);
+				//TestFunctionallity.print(redBlackTree.getRoot());
 				Assert.assertTrue(redBlackTree.delete(elem));
+				i++;
+			}
 			INode<Integer, String> node = redBlackTree.getRoot();
 			if (!(node == null || node.isNull()))
 				Assert.fail();
 		} catch (Throwable e) {
+			System.out.println("Thrown : " + e.getMessage());
 			TestRunner.fail("Fail to handle deletion", e);
 		}
 	}
@@ -536,11 +545,17 @@ public class UnitTest {
 			if ((node == null || node.isNull()))
 				Assert.fail();
 
-			System.out.println(node.getRightChild().getColor() == INode.BLACK);
+				Assert.assertTrue(verifyProperty2(node));
+			Assert.assertTrue(verifyProperty3(node));
+			Assert.assertTrue(verifyProperty4(node));
+			Assert.assertTrue(verifyProperty5(node));
 			Assert.assertTrue(verifyProps(node));
 		} catch (Throwable e) {
 			TestRunner.fail("Fail to handle deletion", e);
 		}
+
+
+		
 	}
 
 	/**

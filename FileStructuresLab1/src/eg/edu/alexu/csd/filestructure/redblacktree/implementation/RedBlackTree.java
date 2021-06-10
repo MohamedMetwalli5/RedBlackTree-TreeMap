@@ -5,6 +5,9 @@ import java.util.Map;
 
 import javax.management.RuntimeErrorException;
 
+import eg.edu.alexu.csd.filestructure.redblacktree.test.TestFunctionallity;
+import junit.framework.Test;
+
 
 public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T, V> {
 
@@ -159,13 +162,20 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		Node<T,V> z = toBeDeleted;
 
 		
+		if (z.isRed()) {
+			z.setKey(null);
+			z.setValue(null);
+			z.setLeftChild(null);
+			z.setRightChild(null);
+			z.setColor(Node.BLACK);
+			return;
+		}
 
-		if (z.isRed() || z.hasRedChild()){
+		if (z.hasRedChild()){
 			// Case 1
 			
 			// Get the non nil child
-			Node<T,V> child = (Node<T, V>) (z.getLeftChild().isNull() ? 
-								z.getRightChild() :  z.getLeftChild());
+			Node<T,V> child = (Node<T, V>) z.getRedChild();
 			
 			// Copy child's key and value to z
 			z.setKey(child.getKey());
@@ -173,7 +183,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			
 			// Set z's children to new nil nodes
 			giveNilChildren(z);
-			
 			z.setColor(Node.BLACK);
 			return;
 		}else {
@@ -246,19 +255,21 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
    }
 
 	
-	private void removeFixup(Node<T,V> toBeDeleted){
-		if (toBeDeleted == root) // Double black at the root is ignored
+	private void removeFixup(Node<T,V> doubleBlack){
+		if (doubleBlack == root) // Double black at the root is ignored
 			return;
 		
-		Node<T,V> sibling = toBeDeleted.getSibling();
-		Node<T,V> parent = (Node<T,V>)toBeDeleted.getParent();
+		Node<T,V> sibling = doubleBlack.getSibling();
+		Node<T,V> parent = (Node<T,V>)doubleBlack.getParent();
 
 
 		if (sibling.isBlack() && sibling.hasRedChild()){
 			Node<T,V> redChild = sibling.getRedChild();
+			//System.out.println("Sibling " + sibling.getKey() + " and has red child : " + redChild.getKey());
 
 			// Right Left / Left Right Case:
 			if (!redChild.isAligned()){
+				//System.out.println("Red child isn't aligned");
 				if (redChild.isLeftChild())
 					rotateRight(sibling);
 				else rotateLeft(sibling);
@@ -266,20 +277,29 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 				
 				sibling.setColor(Node.RED);
 				redChild.setColor(Node.BLACK);
-				removeFixup(toBeDeleted);
-				return;
+				//System.out.println("Non alignment fix : ");
+				//TestFunctionallity.print(root);
 			}
 
+
 			// Right Right / Left Left Case:
+			//System.out.println("Right Right /Left Left");
+			sibling = doubleBlack.getSibling();
+			redChild = sibling.getRedChild();
+			//System.out.println("Parent " + doubleBlack.getParent().getKey());
+			//System.out.println("????Sibling " + sibling.getKey() + " and has red child : " + redChild.getKey());
+
 			redChild.setColor(Node.BLACK);
-			
-			if (parent.isRed()) {
-				parent.setColor(Node.BLACK);
-				sibling.setColor(Node.RED);
-			}
+			sibling.setColor(parent.getColor());
+			parent.setColor(Node.BLACK);
 			if (sibling.isRightChild())
 				rotateLeft(parent);
 			else rotateRight(parent);
+			
+			//System.out.println("After rotation : ");
+			//TestFunctionallity.print(root);
+			//System.out.println("Sibling after rotation : " + sibling.getKey());
+
 			
 			return;
 
@@ -302,7 +322,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 				rotateLeft(parent);
 			else rotateRight(parent);
 
-			removeFixup(toBeDeleted);
+			removeFixup(doubleBlack);
 			return;
 		}
 
