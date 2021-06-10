@@ -118,7 +118,6 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		if (ret == null)
 			return false;
 		
-		size--;
 		return true;
 		
 	}
@@ -147,6 +146,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 			disconnectNilChildren(toBeDeleted);
 		}
 		
+		size--;
 		return ret;
 		
 
