@@ -1,16 +1,13 @@
 package eg.edu.alexu.csd.filestructure.redblacktree.test;
 
-import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
-import eg.edu.alexu.csd.filestructure.redblacktree.test.TestFunctionallity;
+import org.junit.Test;
 import eg.edu.alexu.csd.filestructure.redblacktree.implementation.RedBlackTree;
 class RotateTest {
 
 	@Test
 	void test() {
-		RedBlackTree<Integer, Intsseger> T=new RedBlackTree();
+		RedBlackTree<Integer, Integer> T=new RedBlackTree();
 		
 		int[] insert = new int[] {41, 38, 31, 12, 19, 8};
 		for (int x : insert) {
