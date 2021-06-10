@@ -1,4 +1,5 @@
 package eg.edu.alexu.csd.filestructure.redblacktree.test;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +20,7 @@ import java.util.TreeMap;
 
 import javax.management.RuntimeErrorException;
 
+import org.hamcrest.core.IsInstanceOf;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,7 +30,7 @@ import eg.edu.alexu.csd.filestructure.redblacktree.implementation.ITreeMap;
 
 
 public class UnitTest {
-	private final boolean debug = true;
+	private final boolean debug = false;
 
 	/** 
 	 * test get a null root.
@@ -496,27 +498,18 @@ public class UnitTest {
 		try {
 			Random r = new Random();
 			HashSet<Integer> list = new HashSet<>();
-			//ArrayList<Integer> entered = new ArrayList<>(List.of(2391, 9913, 2905, 9208, 8812, 5657, 8846, 6410, 3044, 5831));
-			for (int i = 0; i < 1000000; i++) {
+			for (int i = 0; i < 100000; i++) {
 				int key = r.nextInt(10000);
-				//int key = entered.get(i);
 				list.add(key);
-				//entered.add(key);
 				redBlackTree.insert(key, "soso" + key);
 			}
-			//System.out.println(entered);
-			int i = 0;
-			for (Integer elem : list) {
-				//System.out.println(elem);
-				//TestFunctionallity.print(redBlackTree.getRoot());
+			
+			for (Integer elem : list) 
 				Assert.assertTrue(redBlackTree.delete(elem));
-				i++;
-			}
 			INode<Integer, String> node = redBlackTree.getRoot();
 			if (!(node == null || node.isNull()))
 				Assert.fail();
 		} catch (Throwable e) {
-			System.out.println("Thrown : " + e.getMessage());
 			TestRunner.fail("Fail to handle deletion", e);
 		}
 	}
@@ -544,18 +537,10 @@ public class UnitTest {
 			INode<Integer, String> node = redBlackTree.getRoot();
 			if ((node == null || node.isNull()))
 				Assert.fail();
-
-				Assert.assertTrue(verifyProperty2(node));
-			Assert.assertTrue(verifyProperty3(node));
-			Assert.assertTrue(verifyProperty4(node));
-			Assert.assertTrue(verifyProperty5(node));
 			Assert.assertTrue(verifyProps(node));
 		} catch (Throwable e) {
 			TestRunner.fail("Fail to handle deletion", e);
 		}
-
-
-		
 	}
 
 	/**
@@ -597,14 +582,13 @@ public class UnitTest {
 		try {
 			Random r = new Random();
 			HashSet<Integer> list = new HashSet<>();
-			for (int i = 0; i < 1000000; i++) {
+			for (int i = 0; i < 10000000; i++) {
 				int key = r.nextInt(10000);
 				list.add(key);
 				redBlackTree.insert(key, "soso" + key);
 			}
-			for (Integer elem : list) {
+			for (Integer elem : list) 
 				redBlackTree.delete(elem);
-			}
 			INode<Integer, String> node = redBlackTree.getRoot();
 			if (!(node == null || node.isNull()))
 				Assert.fail();			
@@ -1304,17 +1288,14 @@ public class UnitTest {
 			int toKey = keys.get(r.nextInt(keys.size()));
 			ArrayList<Map.Entry<Integer, String>> ans = treemap.headMap(toKey);
 			ArrayList<Map.Entry<Integer, String>> realAns = new ArrayList<>(t.headMap(toKey).entrySet());
-			// System.out.println(realAns);
 			Collections.sort(realAns, new Comparator<Map.Entry<Integer, String>>() {
 				@Override
 				public int compare(Map.Entry<Integer, String> o1, Map.Entry<Integer, String> o2) {
 					return o1.getKey() - o2.getKey();
 				}
 			});
-			for (int i = 0; i < ans.size(); i++){
-				System.out.println(i);
+			for (int i = 0; i < ans.size(); i++) 
 				Assert.assertEquals(ans.get(i), realAns.get(i));
-			}
 		} catch (Throwable e) {
  			TestRunner.fail("Fail in headMap", e);
 		}
@@ -1693,14 +1674,12 @@ public class UnitTest {
 		
 		while(!q.isEmpty()) {
 			Field cur = q.poll();
-
+			
 			System.out.println("field name " + cur.getType());
 			if (cur.getType().isPrimitive()) continue;
 			
-			if (cur.getType().isAssignableFrom(TreeMap.class)){
-				System.out.println("Cur = " + cur);
+			if (cur.getType().isAssignableFrom(TreeMap.class))
 				Assert.fail();
-			}
 			q.addAll(Arrays.asList(cur.getType().getDeclaredFields()));
 		}
 		
