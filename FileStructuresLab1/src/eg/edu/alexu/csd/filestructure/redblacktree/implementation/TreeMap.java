@@ -60,6 +60,8 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public boolean containsValue(V value) {
+        if (value == null)
+            throw new RuntimeErrorException(null);
         return this.values().contains(value);
     }
 
@@ -147,14 +149,15 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         return headMap(toKey, false);
     }
 
-    private void headMapHelper(ArrayList<Map.Entry<T, V>> arr, Node<T,V> root)
+    public void headMapHelper(ArrayList<Map.Entry<T, V>> arr, Node<T,V> node)
     {
-        System.out.println("Root: " + root.getKey() + ", left: " + root.getLeftChild() + ", right: " + root.getRightChild());
-        if(root == null || root.isNull())
+        if(node == null || node.isNull())
             return;
-        headMapHelper(arr, (Node<T,V>)root.getLeftChild());
-        arr.add(root.toEntry());
-        headMapHelper(arr, (Node<T,V>)root.getRightChild());
+        System.out.println("Root: " + node.getKey() + ", left: " + node.getLeftChild() + ", right: " + node.getRightChild());
+        
+        headMapHelper(arr, (Node<T,V>)node.getLeftChild());
+        arr.add(node.toEntry());
+        headMapHelper(arr, (Node<T,V>)node.getRightChild());
     }
 
     @Override
@@ -245,6 +248,8 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
 
     @Override
     public void putAll(Map<T, V> map) {
+        if (map == null)
+            throw new RuntimeErrorException(null);
         for (Map.Entry<T, V> entry : map.entrySet()) {
             RBTree.insert(entry.getKey(), entry.getValue());
         }
@@ -283,11 +288,13 @@ public class TreeMap<T extends Comparable<T>, V> implements ITreeMap<T, V> {
         t.put(20, "moaz");
         t.put(10, "ahmed");
         t.put(5, "omar");
-        RBTreePrinter.print(t.getRoot());
+        //RBTreePrinter.print(t.getRoot());
         /*
          * Set<Map.Entry<Integer,String>> s= t.entrySet(); t.values().forEach((String
          * k)->{ System.out.println(k); });
          */
-
+        ArrayList<Map.Entry<Integer,String>> arr = new ArrayList<Map.Entry<Integer,String>>();
+        t.headMapHelper(arr, t.getRoot());
+        System.out.println(arr);
     }
 }

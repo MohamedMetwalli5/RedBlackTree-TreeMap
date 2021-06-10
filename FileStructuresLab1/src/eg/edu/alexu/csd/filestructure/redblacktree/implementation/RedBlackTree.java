@@ -129,21 +129,22 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 		Node<T, V> toBeDeleted = searchNode(key);
 		if(toBeDeleted == null)   // if the tree doesn't contain the node to be deleted
 			return null;
+
 		
+
 		Map.Entry<T,V> ret = toBeDeleted.toEntry();
 		
 	
 		if (toBeDeleted.internalNode()){
+			
 			Node<T,V> successor = (Node<T,V>)minValue(toBeDeleted.getRightChild());
 
 			toBeDeleted.setKey(successor.getKey());
 			toBeDeleted.setValue(successor.getValue());
 			removeHelper(successor);
-			disconnectNilChildren(successor);
 			
 		}else {
 			removeHelper(toBeDeleted);
-			disconnectNilChildren(toBeDeleted);
 		}
 		
 		size--;
@@ -309,8 +310,14 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	
 	public Node<T, V> searchNode(T key) {
 		Node<T,V> temp = root;
+		if (root.isNull())
+			return null;
+
 		while(!temp.isNull()) {
 			if(temp.getKey().compareTo(key) == 0) {
+				if (temp.isNull()){
+					System.out.println("A7aaaaaaaaaaaaaaaaaa");
+				}
 				return temp;
 			}else if(temp.getKey().compareTo(key)<0) {
 				temp = (Node<T, V>) temp.getRightChild();
@@ -318,6 +325,7 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 				temp = (Node<T, V>) temp.getLeftChild();
 			}
 		}
+
 		return null;
 	}
 		
@@ -464,16 +472,17 @@ public class RedBlackTree<T extends Comparable<T>, V> implements IRedBlackTree<T
 	}
 	
 	private void disconnectNilChildren(Node<T,V> node) {
-		if (node.isNull()) {
-			node.setParent(null);
-			node.setRightChild(null);
-			node.setLeftChild(null);
+		if (node == null)
 			return;
+
+		Node<T,V> parent = (Node<T, V>) node.getParent();
+		if (node.isLeftChild()) {
+			parent.setLeftChild(null);
+		}else {
+			parent.setRightChild(null);
 		}
-		node.getLeftChild().setParent(null);
-		node.getRightChild().setParent(null);
-		node.setRightChild(null);
-		node.setLeftChild(null);
+
+
 	}
 	
     public void toArrayList (Node<T,V> node, ArrayList<Map.Entry<T,V>> arr){
